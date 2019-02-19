@@ -87,7 +87,8 @@ public class TestContainersBuilder {
         }
         if (fileStorageTestContainerEnable && networkEnable) {
             testContainers.setFileStorageTestContainer(
-                    new GenericContainer<>("dr.rbkmoney.com/rbkmoney/file-storage:0d66e41b5c6200bb2101929f6c03b7430fa98958")
+                    //todo ba630baa85c17e9437386dafec982e4338f58663
+                    new GenericContainer<>("dr.rbkmoney.com/rbkmoney/file-storage:ba630baa85c17e9437386dafec982e4338f58663")
                             .withEnv("storage.endpoint", "http://ceph-test-container:80")
                             .withEnv("storage.signingRegion", SIGNING_REGION)
                             .withEnv("storage.accessKey", AWS_ACCESS_KEY)

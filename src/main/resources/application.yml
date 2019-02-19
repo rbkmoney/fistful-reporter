@@ -8,9 +8,7 @@ management:
     export:
       statsd:
         flavor: etsy
-        #enabled=true
-        #host=localhost
-        #port=8125
+        enabled: false
   security:
     flag: false
 spring:

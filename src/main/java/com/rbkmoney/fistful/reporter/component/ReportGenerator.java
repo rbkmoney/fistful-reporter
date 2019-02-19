@@ -11,12 +11,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.validation.ValidationException;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -28,21 +28,25 @@ public class ReportGenerator {
     private final FileInfoService fileInfoService;
     private final FileStorageService fileStorageService;
 
-    public void generateReportFile(Report report) {
+    public void generateReportFile(Report report) throws RuntimeException {
         try {
-            logInfo("Trying to process report, ", report);
+            logInfo("Start of report building, ", report);
 
             List<String> fileDataIds = new ArrayList<>();
             for (TemplateService templateService : templateServices) {
                 if (templateService.accept(report.getType())) {
-                    Path reportFile = Files.createTempFile(report.getType() + "_", "_report.xlsx");
+                    logInfo("Create temp report file, template type: " + templateService.getTemplateType() + "; report: ", report);
+                    Path reportFile = Files.createTempFile("reportId_" + report.getId() + "_" + templateService.getTemplateType() + "_" + UUID.randomUUID().toString(), ".xlsx");
                     try {
+                        logInfo("Fill temp report file in with data, template type: " + templateService.getTemplateType() + "; report: ", report);
                         templateService.processReportFileByTemplate(report, Files.newOutputStream(reportFile));
+
+                        logInfo("Save temp report file in file storage, template type: " + templateService.getTemplateType() + "; report: ", report);
                         String fileDataId = fileStorageService.saveFile(reportFile);
+
                         fileDataIds.add(fileDataId);
-                    } catch (IOException ex) {
-                        logError("The report has failed to save, ", report);
                     } finally {
+                        logInfo("Delete temp report file, template type: " + templateService.getTemplateType() + "; report: ", report);
                         Files.deleteIfExists(reportFile);
                     }
                 }
@@ -50,61 +54,52 @@ public class ReportGenerator {
 
             finishedReportTask(report, fileDataIds);
 
-            logInfo("Report has been successfully processed, ", report);
-        } catch (ValidationException ex) {
-            logError("Report data validation failed, ", report);
-            reportService.changeReportStatus(report, ReportStatus.cancelled);
+            logInfo("Successfully end of report building, ", report);
         } catch (Exception ex) {
-            logError("The report has failed to process, ", report);
+            logError("Failed end of report building, ", report, ex);
+            throw new RuntimeException(ex);
         }
     }
 
     private void finishedReportTask(Report report, List<String> fileDataIds) throws StorageException {
+        String fileDataIdsLog = fileDataIds.stream()
+                .collect(Collectors.joining(", ", "[", "]"));
+
+        logInfo("Save report files information, fileDataIds: " + fileDataIdsLog + "; report: ", report);
         fileInfoService.save(report.getId(), fileDataIds);
+
+        logInfo("Change report status on [created], ", report);
         reportService.changeReportStatus(report, ReportStatus.created);
     }
 
     private void logInfo(String message, Report report) {
-        log.info(
-                message +
-                        "reportId='{}', " +
-                        "partyId='{}', " +
-                        "contractId='{}', " +
-                        "fromTime='{}', " +
-                        "toTime='{}', " +
-                        "createdAt='{}', " +
-                        "reportType='{}', " +
-                        "status='{}'"
-                ,
-                report.getId(),
-                report.getPartyId(),
-                report.getContractId(),
-                report.getFromTime(),
-                report.getToTime(),
-                report.getCreatedAt(),
-                report.getType(),
-                report.getStatus()
-        );
+        String format = getFormatMessage(message, report);
+        log.info(format);
     }
 
-    private void logError(String message, Report report) {
-        log.error(
+    private void logError(String message, Report report, Exception ex) {
+        String format = getFormatMessage(message, report);
+        log.error(format, ex);
+    }
+
+    private String getFormatMessage(String message, Report report) {
+        return String.format(
                 message +
-                        "reportId='{}', " +
-                        "partyId='{}', " +
-                        "contractId='{}', " +
-                        "fromTime='{}', " +
-                        "toTime='{}', " +
-                        "createdAt='{}', " +
-                        "reportType='{}', " +
-                        "status='{}'"
+                        "reportId='%s', " +
+                        "partyId='%s', " +
+                        "contractId='%s', " +
+                        "fromTime='%s', " +
+                        "toTime='%s', " +
+                        "createdAt='%s', " +
+                        "reportType='%s', " +
+                        "status='%s'"
                 ,
                 report.getId(),
                 report.getPartyId(),
                 report.getContractId(),
-                report.getFromTime(),
-                report.getToTime(),
-                report.getCreatedAt(),
+                report.getFromTime().toString(),
+                report.getToTime().toString(),
+                report.getCreatedAt().toString(),
                 report.getType(),
                 report.getStatus()
         );

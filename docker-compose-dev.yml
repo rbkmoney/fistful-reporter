@@ -27,7 +27,7 @@ services:
       CEPH_DEMO_SECRET_KEY: "test"
       CEPH_DEMO_BUCKET: "test"
   file-storage-test-container:
-    image: 'dr.rbkmoney.com/rbkmoney/file-storage:0d66e41b5c6200bb2101929f6c03b7430fa98958'
+    image: 'dr.rbkmoney.com/rbkmoney/file-storage:replace_me_on_last_tag'
     depends_on:
     - ceph-test-container
     container_name: file-storage-test-container

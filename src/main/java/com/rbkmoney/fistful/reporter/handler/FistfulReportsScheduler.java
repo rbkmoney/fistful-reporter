@@ -24,12 +24,11 @@ public class FistfulReportsScheduler {
 
     @Scheduled(fixedDelayString = "${reporting.pollingDelay:3000}")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void processPendingReports() {
+    public void processPendingReports() throws RuntimeException {
         if (reportingProperties.isPollingEnable()) {
             List<Report> reports = reportService.getPendingReports();
-            if (!reports.isEmpty()) {
-                log.debug("Trying to process {} pending reports", reports.size());
-                reports.forEach(reportGenerator::generateReportFile);
+            for (Report report : reports) {
+                reportGenerator.generateReportFile(report);
             }
         }
     }

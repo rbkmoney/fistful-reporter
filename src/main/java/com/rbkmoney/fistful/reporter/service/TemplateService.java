@@ -12,6 +12,8 @@ import java.io.OutputStream;
 @Service
 public interface TemplateService {
 
+    String getTemplateType();
+
     boolean accept(String reportType);
 
     void processReportFileByTemplate(Report report, OutputStream outputStream) throws IOException;

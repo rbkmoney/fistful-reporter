@@ -5,5 +5,5 @@ import java.nio.file.Path;
 
 public interface FileStorageService {
 
-    String saveFile(Path file) throws IOException;
+    String saveFile(Path file) throws IOException, RuntimeException;
 }
