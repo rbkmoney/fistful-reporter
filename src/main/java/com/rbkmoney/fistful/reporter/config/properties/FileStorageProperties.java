@@ -13,7 +13,6 @@ import java.time.ZoneId;
 public class FileStorageProperties {
 
     private Resource url;
-    private Resource healthCheckUrl;
     private int clientTimeout;
     private Long urlLifeTimeDuration;
     private ZoneId timeZone;

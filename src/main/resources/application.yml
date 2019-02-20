@@ -35,7 +35,6 @@ partymanagement:
   timeout: 5000
 filestorage:
   url: http://file-storage:8022/file_storage
-  healthCheckUrl: http://file-storage:8022/actuator/health
   clientTimeout: 5000
   urlLifeTimeDuration: 360
   timeZone: Europe/Moscow
