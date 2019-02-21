@@ -34,6 +34,11 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
     }
 
     @Override
+    public String getReportPrefixName() {
+        return "Withdrawals_registry";
+    }
+
+    @Override
     public boolean accept(String reportType) {
         return reportType.equals(ReportType.WITHDRAWAL_REGISTRY.getType());
     }

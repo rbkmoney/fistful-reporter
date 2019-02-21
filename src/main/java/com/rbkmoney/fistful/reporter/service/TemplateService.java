@@ -14,6 +14,8 @@ public interface TemplateService {
 
     String getTemplateType();
 
+    String getReportPrefixName();
+
     boolean accept(String reportType);
 
     void processReportFileByTemplate(Report report, OutputStream outputStream) throws IOException;

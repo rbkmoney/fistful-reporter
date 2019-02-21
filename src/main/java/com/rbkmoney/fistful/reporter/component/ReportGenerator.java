@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -36,7 +36,7 @@ public class ReportGenerator {
             for (TemplateService templateService : templateServices) {
                 if (templateService.accept(report.getType())) {
                     logInfo("Create temp report file, template type: " + templateService.getTemplateType() + "; report: ", report);
-                    Path reportFile = Files.createTempFile("reportId_" + report.getId() + "_" + templateService.getTemplateType() + "_" + UUID.randomUUID().toString(), ".xlsx");
+                    Path reportFile = Files.createTempFile(getReportName(templateService), ".xlsx");
                     try {
                         logInfo("Fill temp report file in with data, template type: " + templateService.getTemplateType() + "; report: ", report);
                         templateService.processReportFileByTemplate(report, Files.newOutputStream(reportFile));
@@ -70,6 +70,10 @@ public class ReportGenerator {
 
         logInfo("Change report status on [created], ", report);
         reportService.changeReportStatus(report, ReportStatus.created);
+    }
+
+    private String getReportName(TemplateService templateService) {
+        return templateService.getReportPrefixName() + "_report_for_a_period_of_time_" + LocalDateTime.now().toString();
     }
 
     private void logInfo(String message, Report report) {
