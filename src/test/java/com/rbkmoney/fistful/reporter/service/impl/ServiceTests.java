@@ -4,7 +4,6 @@ import com.rbkmoney.damsel.domain.Contract;
 import com.rbkmoney.damsel.domain.Party;
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.file.storage.FileStorageSrv;
-import com.rbkmoney.fistful.reporter.config.properties.FileStorageProperties;
 import com.rbkmoney.fistful.reporter.domain.enums.ReportStatus;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Report;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Withdrawal;
@@ -60,9 +59,6 @@ public class ServiceTests extends AbstractAppServiceTests {
     private FileStorageSrv.Iface client;
 
     @Autowired
-    private FileStorageProperties fileStorageProperties;
-
-    @Autowired
     private PartyManagementService partyManagementService;
 
     @MockBean
@@ -96,9 +92,6 @@ public class ServiceTests extends AbstractAppServiceTests {
         String fileDataId = fileStorageService.saveFile(file);
         String downloadUrl = client.generateDownloadUrl(fileDataId, generateCurrentTimePlusDay().toString());
 
-        if (downloadUrl.contains("ceph-test-container:80")) {
-            downloadUrl = downloadUrl.replaceAll("ceph-test-container:80", fileStorageProperties.getCephEndpoint());
-        }
         HttpResponse responseGet = httpClient.execute(new HttpGet(downloadUrl));
         InputStream content = responseGet.getEntity().getContent();
         assertEquals(getContent(newInputStream(file)), getContent(content));

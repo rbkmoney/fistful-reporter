@@ -16,6 +16,5 @@ public class FileStorageProperties {
     private int clientTimeout;
     private Long urlLifeTimeDuration;
     private ZoneId timeZone;
-    private String cephEndpoint;
 
 }

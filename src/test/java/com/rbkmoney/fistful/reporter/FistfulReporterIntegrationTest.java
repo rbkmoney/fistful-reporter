@@ -3,7 +3,6 @@ package com.rbkmoney.fistful.reporter;
 import com.rbkmoney.damsel.domain.Contract;
 import com.rbkmoney.file.storage.FileStorageSrv;
 import com.rbkmoney.fistful.reporter.component.ReportGenerator;
-import com.rbkmoney.fistful.reporter.config.properties.FileStorageProperties;
 import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.service.PartyManagementService;
 import com.rbkmoney.fistful.reporter.service.ReportService;
@@ -52,9 +51,6 @@ public class FistfulReporterIntegrationTest extends AbstractAppFistfulReporterIn
 
     @Autowired
     private ReportingSrv.Iface reportClient;
-
-    @Autowired
-    private FileStorageProperties fileStorageProperties;
 
     private ReportTimeRange reportTimeRange = new ReportTimeRange(
             temporalToString(fromTime),
@@ -108,9 +104,6 @@ public class FistfulReporterIntegrationTest extends AbstractAppFistfulReporterIn
                 generateCurrentTimePlusDay().toString()
         );
 
-        if (downloadUrl.contains("ceph-test-container:80")) {
-            downloadUrl = downloadUrl.replaceAll("ceph-test-container:80", fileStorageProperties.getCephEndpoint());
-        }
         HttpResponse responseGet = httpClient.execute(new HttpGet(downloadUrl));
         InputStream content = responseGet.getEntity().getContent();
         assertEquals(getContent(newInputStream(reportFile)).substring(0, 5), getContent(content).substring(0, 5));

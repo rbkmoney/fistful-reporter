@@ -16,8 +16,6 @@ services:
     hostname: ceph-test-container
     ports:
     - "42827:80"
-    networks:
-    - fr_backend
     environment:
       SERVICE_NAME: "ceph-test-container"
       RGW_NAME: "localhost"
@@ -32,20 +30,14 @@ services:
     - ceph-test-container
     container_name: file-storage-test-container
     hostname: file-storage-test-container
-    ports:
-    - "42826:8022"
-    networks:
-    - fr_backend
+    network_mode: "host"
     environment:
       SERVICE_NAME: "file-storage-test-container"
-      server.port: "8022"
-      storage.endpoint: "ceph-test-container:80"
+      server.port: "42826"
+      storage.endpoint: "localhost:42827"
       storage.signingRegion: "RU"
       storage.accessKey: "test"
       storage.secretKey: "test"
       storage.clientProtocol: "HTTP"
       storage.clientMaxErrorRetry: "10"
       storage.bucketName: "test"
-
-networks:
-  fr_backend:

@@ -6,6 +6,8 @@ import org.springframework.boot.test.util.TestPropertyValues;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.rbkmoney.TestContainersConstants.FILE_STORAGE_PORT;
+
 public class FistfulReporterTestPropertyValuesBuilder {
 
     public static TestPropertyValues build(TestContainers testContainers) {
@@ -32,20 +34,15 @@ public class FistfulReporterTestPropertyValuesBuilder {
                     strings.add("flyway.password=" + c.getPassword());
                 }
         );
-        testContainers.getCephTestContainer().ifPresent(
-                c -> strings.add("filestorage.cephEndpoint=" + c.getContainerIpAddress() + ":" + c.getMappedPort(80))
-        );
         testContainers.getFileStorageTestContainer().ifPresent(
                 c -> {
-                    strings.add("filestorage.url=http://" + c.getContainerIpAddress() + ":" + c.getMappedPort(8022) + "/file_storage");
-                    strings.add("filestorage.healthCheckUrl=http://" + c.getContainerIpAddress() + ":" + c.getMappedPort(8022) + "/actuator/health");
+                    strings.add("filestorage.url=http://" + c.getContainerIpAddress() + ":" + FILE_STORAGE_PORT + "/file_storage");
                 }
         );
     }
 
     private static void withoutUsingTestContainers(List<String> strings) {
-        strings.add("filestorage.cephEndpoint=localhost:42827");
-        strings.add("filestorage.url=http://localhost:42826/file_storage");
-        strings.add("filestorage.healthCheckUrl=http://localhost:42826/actuator/health");
+        // FILE_STORAGE_PORT должен совпадать с портом из docker-compose-dev.yml
+        strings.add("filestorage.url=http://localhost:" + FILE_STORAGE_PORT + "/file_storage");
     }
 }

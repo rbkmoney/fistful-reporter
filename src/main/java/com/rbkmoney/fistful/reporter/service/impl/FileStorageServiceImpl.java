@@ -40,7 +40,6 @@ public class FileStorageServiceImpl implements FileStorageService {
 
         log.info("Trying to upload report file to storage");
         String uploadUrl = result.getUploadUrl();
-        uploadUrl = checkTestSignature(uploadUrl);
         HttpPut requestPut = new HttpPut(uploadUrl);
         requestPut.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8.name()));
         requestPut.setEntity(new FileEntity(file.toFile()));
@@ -85,15 +84,5 @@ public class FileStorageServiceImpl implements FileStorageService {
                     )
             );
         }
-    }
-
-    // костыль для FileStorageServiceImplTest >.<
-    // тк при генерации ссылки для загрузки в url вставляется то, что указано в {storage.endpoint: "ceph-test:80"}
-    // {network_mode: host} не работает на Docker For Mac
-    private String checkTestSignature(String uploadUrl) {
-        if (uploadUrl.contains("ceph-test-container:80")) {
-            uploadUrl = uploadUrl.replaceAll("ceph-test-container:80", fileStorageProperties.getCephEndpoint());
-        }
-        return uploadUrl;
     }
 }
