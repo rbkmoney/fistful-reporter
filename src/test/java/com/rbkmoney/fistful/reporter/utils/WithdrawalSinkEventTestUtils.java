@@ -1,6 +1,6 @@
 package com.rbkmoney.fistful.reporter.utils;
 
-import com.rbkmoney.AbstractTestUtils;
+import com.rbkmoney.easyway.AbstractTestUtils;
 import com.rbkmoney.fistful.base.Cash;
 import com.rbkmoney.fistful.cashflow.*;
 import com.rbkmoney.fistful.withdrawal.*;

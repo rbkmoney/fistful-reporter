@@ -1,6 +1,6 @@
 package com.rbkmoney.fistful.reporter.utils;
 
-import com.rbkmoney.AbstractTestUtils;
+import com.rbkmoney.easyway.AbstractTestUtils;
 import com.rbkmoney.fistful.reporter.dao.IdentityDao;
 import com.rbkmoney.fistful.reporter.dao.WalletDao;
 import com.rbkmoney.fistful.reporter.dao.WithdrawalDao;
@@ -45,13 +45,13 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
         for (Wallet wallet : createWallets(identityId, partyId, contractId, walletId)) {
             walletDao.save(wallet);
         }
-        for (Withdrawal withdrawal : createWithdrawals(identityId, partyId, contractId, walletId, inFromToPeriodTime)) {
+        for (Withdrawal withdrawal : createWithdrawals(identityId, partyId, contractId, walletId, getInFromToPeriodTime())) {
             withdrawalDao.save(withdrawal);
         }
     }
 
     protected Report createReport() {
-        return createReport(partyId, contractId, toTime, fromTime);
+        return createReport(partyId, contractId, getToTime(), getFromTime());
     }
 
     private com.rbkmoney.fistful.reporter.domain.tables.pojos.Report createReport(String partyId, String contractId, LocalDateTime toTime, LocalDateTime fromTime) {

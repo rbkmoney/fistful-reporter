@@ -134,14 +134,14 @@ public class DaoTests extends AbstractAppDaoTests {
         jdbcTemplate.execute("truncate table fr.report cascade");
 
         Report report = random(Report.class);
-        configReport(report, fromTime, toTime);
+        configReport(report, getFromTime(), getToTime());
         long id = reportDao.save(report);
         Report expectedReport = reportDao.getReport(id, report.getPartyId(), report.getContractId());
         assertEquals(report, expectedReport);
 
         List<Report> reports = randomListOf(4, Report.class);
         for (Report r : reports) {
-            configReport(r, fromTime, toTime);
+            configReport(r, getFromTime(), getToTime());
             reportDao.save(r);
         }
         assertEquals(5, reportDao.getPendingReports().size());
@@ -149,9 +149,9 @@ public class DaoTests extends AbstractAppDaoTests {
         reportDao.changeReportStatus(id, ReportStatus.created);
         assertEquals(4, reportDao.getPendingReports().size());
 
-        assertEquals(5, reportDao.getReportsByRange(partyId, contractId, fromTime, toTime, emptyList()).size());
+        assertEquals(5, reportDao.getReportsByRange(partyId, contractId, getFromTime(), getToTime(), emptyList()).size());
 
-        assertEquals(0, reportDao.getReportsByRange(partyId, contractId, fromTime.plusMinutes(1), toTime, emptyList()).size());
+        assertEquals(0, reportDao.getReportsByRange(partyId, contractId, getFromTime().plusMinutes(1), getToTime(), emptyList()).size());
     }
 
     @Test

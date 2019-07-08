@@ -53,8 +53,8 @@ public class FistfulReporterIntegrationTest extends AbstractAppFistfulReporterIn
     private ReportingSrv.Iface reportClient;
 
     private ReportTimeRange reportTimeRange = new ReportTimeRange(
-            temporalToString(fromTime),
-            temporalToString(toTime)
+            temporalToString(getFromTime()),
+            temporalToString(getToTime())
     );
     private ReportRequest request = new ReportRequest(partyId, contractId, reportTimeRange);
 

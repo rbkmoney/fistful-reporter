@@ -75,8 +75,8 @@ public class ServiceTests extends AbstractAppServiceTests {
         long reportId = reportService.createReport(
                 partyId,
                 contractId,
-                fromTime.toInstant(ZoneOffset.UTC),
-                toTime.toInstant(ZoneOffset.UTC),
+                getFromTime().toInstant(ZoneOffset.UTC),
+                getToTime().toInstant(ZoneOffset.UTC),
                 "withdrawalRegistry"
         );
 
@@ -134,8 +134,8 @@ public class ServiceTests extends AbstractAppServiceTests {
                 reportService.getReportsByRange(
                         partyId,
                         contractId,
-                        fromTime.toInstant(ZoneOffset.UTC),
-                        toTime.toInstant(ZoneOffset.UTC),
+                        getFromTime().toInstant(ZoneOffset.UTC),
+                        getToTime().toInstant(ZoneOffset.UTC),
                         singletonList("withdrawalRegistry")
                 )
                         .size()
@@ -143,7 +143,7 @@ public class ServiceTests extends AbstractAppServiceTests {
 
         Long reportId = reportIds.get(0);
         Report report = reportService.getReport(partyId, contractId, reportId);
-        assertEquals(toTime, report.getToTime());
+        assertEquals(getToTime(), report.getToTime());
 
         reportService.cancelReport(partyId, contractId, reportId);
 
@@ -152,8 +152,8 @@ public class ServiceTests extends AbstractAppServiceTests {
                 reportService.getReportsByRangeNotCancelled(
                         partyId,
                         contractId,
-                        fromTime.toInstant(ZoneOffset.UTC),
-                        toTime.toInstant(ZoneOffset.UTC),
+                        getFromTime().toInstant(ZoneOffset.UTC),
+                        getToTime().toInstant(ZoneOffset.UTC),
                         singletonList("withdrawalRegistry")
                 )
                         .size()
@@ -166,8 +166,8 @@ public class ServiceTests extends AbstractAppServiceTests {
                 reportService.getReportsByRangeNotCancelled(
                         partyId,
                         contractId,
-                        fromTime.toInstant(ZoneOffset.UTC),
-                        toTime.toInstant(ZoneOffset.UTC),
+                        getFromTime().toInstant(ZoneOffset.UTC),
+                        getToTime().toInstant(ZoneOffset.UTC),
                         singletonList("withdrawalRegistry")
                 )
                         .size()
@@ -213,8 +213,8 @@ public class ServiceTests extends AbstractAppServiceTests {
         return reportService.createReport(
                 partyId,
                 contractId,
-                fromTime.toInstant(ZoneOffset.UTC),
-                toTime.toInstant(ZoneOffset.UTC),
+                getFromTime().toInstant(ZoneOffset.UTC),
+                getToTime().toInstant(ZoneOffset.UTC),
                 reportType
         );
     }
