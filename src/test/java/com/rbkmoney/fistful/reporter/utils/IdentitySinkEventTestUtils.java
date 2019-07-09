@@ -2,10 +2,11 @@ package com.rbkmoney.fistful.reporter.utils;
 
 import com.rbkmoney.easyway.AbstractTestUtils;
 import com.rbkmoney.fistful.identity.*;
+import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
+import lombok.SneakyThrows;
 
 import java.util.List;
 
-import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static java.util.Arrays.asList;
 
 public class IdentitySinkEventTestUtils extends AbstractTestUtils {
@@ -31,19 +32,21 @@ public class IdentitySinkEventTestUtils extends AbstractTestUtils {
         );
     }
 
+    @SneakyThrows
     private static Change createCreatedChange() {
-        return Change.created(random(com.rbkmoney.fistful.identity.Identity.class));
+        return Change.created(mockTBaseProcessor.process(new Identity(), new TBaseHandler<>(Identity.class)));
     }
 
     private static Change createLevelChangedChange() {
         return Change.level_changed(generateString());
     }
 
+    @SneakyThrows
     private static Change createChallengeCreatedChange(String challengeId) {
         return Change.identity_challenge(
                 new ChallengeChange(
                         challengeId,
-                        ChallengeChangePayload.created(random(Challenge.class))
+                        ChallengeChangePayload.created(mockTBaseProcessor.process(new Challenge(), new TBaseHandler<>(Challenge.class)))
                 )
         );
     }

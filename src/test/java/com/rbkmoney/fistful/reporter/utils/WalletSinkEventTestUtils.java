@@ -2,10 +2,10 @@ package com.rbkmoney.fistful.reporter.utils;
 
 import com.rbkmoney.easyway.AbstractTestUtils;
 import com.rbkmoney.fistful.account.Account;
-import com.rbkmoney.fistful.wallet.AccountChange;
-import com.rbkmoney.fistful.wallet.Change;
-import com.rbkmoney.fistful.wallet.Event;
-import com.rbkmoney.fistful.wallet.SinkEvent;
+import com.rbkmoney.fistful.wallet.*;
+import com.rbkmoney.fistful.withdrawal.Withdrawal;
+import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
+import lombok.SneakyThrows;
 
 import java.util.List;
 
@@ -30,8 +30,9 @@ public class WalletSinkEventTestUtils extends AbstractTestUtils {
         );
     }
 
+    @SneakyThrows
     private static Change createCreatedChange() {
-        return Change.created(random(com.rbkmoney.fistful.wallet.Wallet.class));
+        return Change.created(mockTBaseProcessor.process(new Wallet(), new TBaseHandler<>(Wallet.class)));
     }
 
     private static Change createAccountCreatedChange(String identityId) {

@@ -6,11 +6,13 @@ import com.rbkmoney.fistful.destination.Resource;
 import com.rbkmoney.fistful.destination.SinkEvent;
 import com.rbkmoney.fistful.reporter.dao.DestinationDao;
 import com.rbkmoney.fistful.reporter.domain.enums.DestinationEventType;
+import com.rbkmoney.fistful.reporter.domain.enums.DestinationResourceType;
 import com.rbkmoney.fistful.reporter.domain.enums.DestinationStatus;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Destination;
 import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.DestinationEventHandler;
+import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +54,11 @@ public class DestinationCreatedHandler implements DestinationEventHandler {
                 if (bankCard.isSetPaymentSystem()) {
                     destination.setResourceBankCardPaymentSystem(bankCard.getPaymentSystem().toString());
                 }
+            } else if (resource.isSetCryptoWallet()) {
+                destination.setCryptoWalletId(resource.getCryptoWallet().getId());
+                destination.setCryptoWalletCurrency(resource.getCryptoWallet().getCurrency().name());
             }
+            destination.setResourceType(TBaseUtil.unionFieldToEnum(resource, DestinationResourceType.class));
 
             destinationDao.updateNotCurrent(event.getSource());
             destinationDao.save(destination);

@@ -103,6 +103,7 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
             withdrawal.setPartyId(partyId);
             withdrawal.setPartyContractId(contractId);
             withdrawal.setIdentityId(identityId);
+            withdrawal.setCurrencyCode("RUB");
             withdrawals.add(withdrawal);
         }
         for (Withdrawal withdrawal : randomListOf(4, Withdrawal.class)) {
@@ -118,6 +119,7 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
             withdrawal.setPartyId(partyId);
             withdrawal.setPartyContractId(contractId);
             withdrawal.setIdentityId(identityId);
+            withdrawal.setCurrencyCode("RUB");
             withdrawals.add(withdrawal);
         }
         for (Withdrawal withdrawal : randomListOf(4, Withdrawal.class)) {
@@ -126,6 +128,7 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
             withdrawal.setWithdrawalStatus(WithdrawalStatus.succeeded);
             withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_CREATED);
             withdrawal.setEventCreatedAt(eventCreatedAtTime);
+            withdrawal.setCurrencyCode("RUB");
             withdrawals.add(withdrawal);
         }
         for (Withdrawal withdrawal : randomListOf(4, Withdrawal.class)) {
@@ -137,6 +140,7 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
             withdrawal.setPartyId(partyId);
             withdrawal.setPartyContractId(contractId);
             withdrawal.setIdentityId(identityId);
+            withdrawal.setCurrencyCode("RUB");
             withdrawals.add(withdrawal);
         }
         return withdrawals;
