@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 
 import java.util.List;
 
+import static com.rbkmoney.fistful.reporter.utils.AbstractWithdrawalTestUtils.mockTBaseProcessor;
 import static java.util.Arrays.asList;
 
 public class IdentitySinkEventTestUtils extends AbstractTestUtils {
