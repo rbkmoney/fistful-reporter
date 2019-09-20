@@ -28,14 +28,17 @@ public class WithdrawalCreatedHandler implements WithdrawalEventHandler {
 
     @Override
     public boolean accept(Change change) {
-        return change.isSetCreated();
+        return change.isSetCreated() && change.getCreated().isSetWithdrawal();
     }
 
     @Override
     public void handle(Change change, SinkEvent event) {
         try {
+            var withdrawalDamsel = change.getCreated().getWithdrawal();
+
             log.info("Start withdrawal created handling, eventId={}, walletId={}", event.getId(), event.getSource());
-            Wallet wallet = getWallet(event, change.getCreated().getSource());
+
+            Wallet wallet = getWallet(event, withdrawalDamsel.getSource());
 
             Withdrawal withdrawal = new Withdrawal();
 
@@ -45,15 +48,15 @@ public class WithdrawalCreatedHandler implements WithdrawalEventHandler {
             withdrawal.setSequenceId(event.getPayload().getSequence());
             withdrawal.setEventOccuredAt(TypeUtil.stringToLocalDateTime(event.getPayload().getOccuredAt()));
             withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_CREATED);
-            withdrawal.setWalletId(change.getCreated().getSource());
-            withdrawal.setDestinationId(change.getCreated().getDestination());
+            withdrawal.setWalletId(withdrawalDamsel.getSource());
+            withdrawal.setDestinationId(withdrawalDamsel.getDestination());
             withdrawal.setWithdrawalStatus(WithdrawalStatus.pending);
 
             withdrawal.setPartyId(wallet.getPartyId());
             withdrawal.setPartyContractId(wallet.getPartyContractId());
             withdrawal.setIdentityId(wallet.getIdentityId());
 
-            Cash cash = change.getCreated().getBody();
+            Cash cash = withdrawalDamsel.getBody();
             withdrawal.setAmount(cash.getAmount());
             withdrawal.setCurrencyCode(cash.getCurrency().getSymbolicCode());
 

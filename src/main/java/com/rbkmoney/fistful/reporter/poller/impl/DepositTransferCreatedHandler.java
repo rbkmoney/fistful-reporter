@@ -33,13 +33,17 @@ public class DepositTransferCreatedHandler implements DepositEventHandler {
 
     @Override
     public boolean accept(Change change) {
-        return change.isSetTransfer() && change.getTransfer().isSetCreated();
+        return change.isSetTransfer() && change.getTransfer().isSetPayload() && change.getTransfer().getPayload().isSetCreated()
+                && change.getTransfer().getPayload().getCreated().isSetTransfer() && change.getTransfer().getPayload().getCreated().getTransfer().isSetCashflow();
     }
 
     @Override
     public void handle(Change change, SinkEvent event) {
         try {
+            List<FinalCashFlowPosting> postings = change.getTransfer().getPayload().getCreated().getTransfer().getCashflow().getPostings();
+
             log.info("Start deposit transfer created handling, eventId={}, depositId={}, transferChange={}", event.getId(), event.getSource(), change.getTransfer());
+
             Deposit deposit = depositDao.get(event.getSource());
 
             deposit.setId(null);
@@ -53,7 +57,6 @@ public class DepositTransferCreatedHandler implements DepositEventHandler {
             deposit.setEventType(DepositEventType.DEPOSIT_TRANSFER_CREATED);
             deposit.setDepositTransferStatus(DepositTransferStatus.created);
 
-            List<FinalCashFlowPosting> postings = change.getTransfer().getCreated().getCashflow().getPostings();
             deposit.setFee(CashFlowUtil.getFistfulFee(postings));
             deposit.setProviderFee(CashFlowUtil.getFistfulProviderFee(postings));
 

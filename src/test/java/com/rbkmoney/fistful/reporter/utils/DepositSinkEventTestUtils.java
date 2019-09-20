@@ -1,15 +1,16 @@
 package com.rbkmoney.fistful.reporter.utils;
 
 import com.rbkmoney.easyway.AbstractTestUtils;
-import com.rbkmoney.fistful.base.Cash;
-import com.rbkmoney.fistful.cashflow.*;
 import com.rbkmoney.fistful.deposit.*;
+import com.rbkmoney.fistful.deposit.status.Status;
+import com.rbkmoney.fistful.deposit.status.Succeeded;
 
 import java.util.List;
 
+import static com.rbkmoney.fistful.reporter.utils.TrasnferTestUtil.getCashFlowPayload;
+import static com.rbkmoney.fistful.reporter.utils.TrasnferTestUtil.getCommitedPayload;
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 
 public class DepositSinkEventTestUtils extends AbstractTestUtils {
 
@@ -31,40 +32,20 @@ public class DepositSinkEventTestUtils extends AbstractTestUtils {
     }
 
     private static Change createCreatedChange(String walletId) {
-        Deposit deposit = random(Deposit.class);
+        Deposit deposit = random(Deposit.class, "status");
         deposit.setWallet(walletId);
-        return Change.created(deposit);
+        return Change.created(new CreatedChange(deposit));
     }
 
     private static Change createStatusChangedChange() {
-        return Change.status_changed(DepositStatus.succeeded(new DepositSucceeded()));
+        return Change.status_changed(new StatusChange(Status.succeeded(new Succeeded())));
     }
 
     private static Change createTransferStatusChangedChange() {
-        return Change.transfer(TransferChange.status_changed(TransferStatus.committed(new TransferCommitted())));
+        return Change.transfer(new TransferChange(getCommitedPayload()));
     }
 
     private static Change createTransferCreatedChange() {
-        return Change.transfer(
-                TransferChange.created(
-                        new Transfer(
-                                new FinalCashFlow(
-                                        singletonList(
-                                                new FinalCashFlowPosting(
-                                                        new FinalCashFlowAccount(
-                                                                CashFlowAccount.merchant(MerchantCashFlowAccount.payout),
-                                                                generateString()
-                                                        ),
-                                                        new FinalCashFlowAccount(
-                                                                CashFlowAccount.provider(ProviderCashFlowAccount.settlement),
-                                                                generateString()
-                                                        ),
-                                                        random(Cash.class)
-                                                )
-                                        )
-                                )
-                        )
-                )
-        );
+        return Change.transfer(new TransferChange(getCashFlowPayload()));
     }
 }

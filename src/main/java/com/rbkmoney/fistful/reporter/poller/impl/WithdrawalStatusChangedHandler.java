@@ -12,6 +12,7 @@ import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.WithdrawalEventHandler;
 import com.rbkmoney.fistful.withdrawal.Change;
 import com.rbkmoney.fistful.withdrawal.SinkEvent;
+import com.rbkmoney.fistful.withdrawal.status.Status;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import lombok.RequiredArgsConstructor;
@@ -30,16 +31,17 @@ public class WithdrawalStatusChangedHandler implements WithdrawalEventHandler {
 
     @Override
     public boolean accept(Change change) {
-        return change.isSetStatusChanged();
+        return change.isSetStatusChanged() && change.getStatusChanged().isSetStatus();
     }
 
     @Override
     public void handle(Change change, SinkEvent event) {
         try {
-            log.info("Start withdrawal status changed handling, eventId={}, walletId={}, status={}", event.getId(), event.getSource(), change.getStatusChanged());
-            Withdrawal withdrawal = withdrawalDao.get(event.getSource());
+            Status status = change.getStatusChanged().getStatus();
 
-            long sourceId = withdrawal.getId();
+            log.info("Start withdrawal status changed handling, eventId={}, walletId={}, status={}", event.getId(), event.getSource(), change.getStatusChanged());
+
+            Withdrawal withdrawal = withdrawalDao.get(event.getSource());
 
             withdrawal.setId(null);
             withdrawal.setWtime(null);
@@ -50,12 +52,12 @@ public class WithdrawalStatusChangedHandler implements WithdrawalEventHandler {
             withdrawal.setSequenceId(event.getPayload().getSequence());
             withdrawal.setEventOccuredAt(TypeUtil.stringToLocalDateTime(event.getPayload().getOccuredAt()));
             withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_STATUS_CHANGED);
-            withdrawal.setWithdrawalStatus(TBaseUtil.unionFieldToEnum(change.getStatusChanged(), WithdrawalStatus.class));
+            withdrawal.setWithdrawalStatus(TBaseUtil.unionFieldToEnum(status, WithdrawalStatus.class));
 
             withdrawalDao.updateNotCurrent(event.getSource());
             long id = withdrawalDao.save(withdrawal);
 
-            List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(sourceId, FistfulCashFlowChangeType.withdrawal);
+            List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(withdrawal.getId(), FistfulCashFlowChangeType.withdrawal);
             fillCashFlows(cashFlows, event, WithdrawalEventType.WITHDRAWAL_STATUS_CHANGED, id);
 
             fistfulCashFlowDao.save(cashFlows);

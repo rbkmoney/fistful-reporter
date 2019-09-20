@@ -32,12 +32,15 @@ public class WithdrawalTransferCreatedHandler implements WithdrawalEventHandler 
 
     @Override
     public boolean accept(Change change) {
-        return change.isSetTransfer() && change.getTransfer().isSetCreated();
+        return change.isSetTransfer() && change.getTransfer().isSetPayload() && change.getTransfer().getPayload().isSetCreated()
+                && change.getTransfer().getPayload().getCreated().isSetTransfer() && change.getTransfer().getPayload().getCreated().getTransfer().isSetCashflow();
     }
 
     @Override
     public void handle(Change change, SinkEvent event) {
         try {
+            List<FinalCashFlowPosting> postings = change.getTransfer().getPayload().getCreated().getTransfer().getCashflow().getPostings();
+
             log.info("Start withdrawal transfer created handling, eventId={}, walletId={}, transferChange={}", event.getId(), event.getSource(), change.getTransfer());
             Withdrawal withdrawal = withdrawalDao.get(event.getSource());
 
@@ -52,7 +55,6 @@ public class WithdrawalTransferCreatedHandler implements WithdrawalEventHandler 
             withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_TRANSFER_CREATED);
             withdrawal.setWithdrawalTransferStatus(WithdrawalTransferStatus.created);
 
-            List<FinalCashFlowPosting> postings = change.getTransfer().getCreated().getCashflow().getPostings();
             withdrawal.setFee(CashFlowUtil.getFistfulFee(postings));
             withdrawal.setProviderFee(CashFlowUtil.getFistfulProviderFee(postings));
 

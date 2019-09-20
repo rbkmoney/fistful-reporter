@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>fistful-reporter</artifactId>
-    <version>0.9.4-SNAPSHOT</version>
+    <version>0.9.5-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>fistful-reporter</name>
@@ -31,7 +31,7 @@
         <metrics.version>1.1.0</metrics.version>
         <shared.resources.version>0.3.6</shared.resources.version>
         <eventstock.version>1.2.6</eventstock.version>
-        <fistful-proto.version>1.27-e2c29cb</fistful-proto.version>
+        <fistful-proto.version>1.37-22bb851</fistful-proto.version>
         <fistful-reporter-proto.version>1.5-e5157be</fistful-reporter-proto.version>
         <file-storage-proto.version>1.24-a77c0c4</file-storage-proto.version>
         <damsel.version>1.315-78c1128</damsel.version>

@@ -25,13 +25,14 @@ public class SourceStatusChangedHandler implements SourceEventHandler {
 
     @Override
     public boolean accept(Change change) {
-        return change.isSetStatus() && change.getStatus().isSetChanged();
+        return change.isSetStatus() && change.getStatus().isSetStatus();
     }
 
     @Override
     public void handle(Change change, SinkEvent event) {
         try {
-            Status status = change.getStatus().getChanged();
+            Status status = change.getStatus().getStatus();
+
             log.info("Start source status changed handling, eventId={}, sourceId={}, status={}", event.getId(), event.getSource(), status);
 
             Source source = sourceDao.get(event.getSource());

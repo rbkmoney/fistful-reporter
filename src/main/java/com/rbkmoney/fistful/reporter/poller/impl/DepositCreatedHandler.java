@@ -28,14 +28,17 @@ public class DepositCreatedHandler implements DepositEventHandler {
 
     @Override
     public boolean accept(Change change) {
-        return change.isSetCreated();
+        return change.isSetCreated() && change.getCreated().isSetDeposit();
     }
 
     @Override
     public void handle(Change change, SinkEvent event) {
         try {
+            var depositDamsel = change.getCreated().getDeposit();
+
             log.info("Start deposit created handling, eventId={}, depositId={}", event.getId(), event.getSource());
-            Wallet wallet = getWallet(event, change.getCreated().getWallet());
+
+            Wallet wallet = getWallet(event, depositDamsel.getWallet());
 
             Deposit deposit = new Deposit();
 
@@ -45,15 +48,15 @@ public class DepositCreatedHandler implements DepositEventHandler {
             deposit.setSequenceId(event.getPayload().getSequence());
             deposit.setEventOccuredAt(TypeUtil.stringToLocalDateTime(event.getPayload().getOccuredAt()));
             deposit.setEventType(DepositEventType.DEPOSIT_CREATED);
-            deposit.setWalletId(change.getCreated().getWallet());
-            deposit.setSourceId(change.getCreated().getSource());
+            deposit.setWalletId(depositDamsel.getWallet());
+            deposit.setSourceId(depositDamsel.getSource());
             deposit.setDepositStatus(DepositStatus.pending);
 
             deposit.setPartyId(wallet.getPartyId());
             deposit.setPartyContractId(wallet.getPartyContractId());
             deposit.setIdentityId(wallet.getIdentityId());
 
-            Cash cash = change.getCreated().getBody();
+            Cash cash = depositDamsel.getBody();
             deposit.setAmount(cash.getAmount());
             deposit.setCurrencyCode(cash.getCurrency().getSymbolicCode());
 

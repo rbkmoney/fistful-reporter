@@ -28,16 +28,16 @@ public class WithdrawalRouteChangeHandler implements WithdrawalEventHandler {
 
     @Override
     public boolean accept(Change change) {
-        return change.isSetRoute();
+        return change.isSetRoute() && change.getRoute().isSetRoute();
     }
 
     @Override
     public void handle(Change change, SinkEvent event) {
         try {
-            log.info("Start withdrawal provider id changed handling, eventId={}, walletId={}, providerId={}", event.getId(), event.getSource(), change.getRoute().getId());
-            Withdrawal withdrawal = withdrawalDao.get(event.getSource());
+            String providerId = change.getRoute().getRoute().getProviderId();
 
-            long sourceId = withdrawal.getId();
+            log.info("Start withdrawal provider id changed handling, eventId={}, walletId={}, providerId={}", event.getId(), event.getSource(), providerId);
+            Withdrawal withdrawal = withdrawalDao.get(event.getSource());
 
             withdrawal.setId(null);
             withdrawal.setWtime(null);
@@ -48,16 +48,16 @@ public class WithdrawalRouteChangeHandler implements WithdrawalEventHandler {
             withdrawal.setSequenceId(event.getPayload().getSequence());
             withdrawal.setEventOccuredAt(TypeUtil.stringToLocalDateTime(event.getPayload().getOccuredAt()));
             withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_ROUTE_CHANGED);
-            withdrawal.setProviderId(change.getRoute().getId());
+            withdrawal.setProviderId(providerId);
 
             withdrawalDao.updateNotCurrent(event.getSource());
             long id = withdrawalDao.save(withdrawal);
 
-            List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(sourceId, FistfulCashFlowChangeType.withdrawal);
+            List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(withdrawal.getId(), FistfulCashFlowChangeType.withdrawal);
             fillCashFlows(cashFlows, event, WithdrawalEventType.WITHDRAWAL_ROUTE_CHANGED, id);
 
             fistfulCashFlowDao.save(cashFlows);
-            log.info("Withdrawal provider id have been changed, eventId={}, walletId={}, providerId={}", event.getId(), event.getSource(), change.getRoute().getId());
+            log.info("Withdrawal provider id have been changed, eventId={}, walletId={}, providerId={}", event.getId(), event.getSource(), providerId);
         } catch (DaoException e) {
             throw new StorageException(e);
         }

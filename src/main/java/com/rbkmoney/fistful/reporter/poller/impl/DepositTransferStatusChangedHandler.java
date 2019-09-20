@@ -12,6 +12,7 @@ import com.rbkmoney.fistful.reporter.domain.tables.pojos.FistfulCashFlow;
 import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.DepositEventHandler;
+import com.rbkmoney.fistful.transfer.Status;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import lombok.RequiredArgsConstructor;
@@ -30,16 +31,17 @@ public class DepositTransferStatusChangedHandler implements DepositEventHandler 
 
     @Override
     public boolean accept(Change change) {
-        return change.isSetTransfer() && change.getTransfer().isSetStatusChanged();
+        return change.isSetTransfer() && change.getTransfer().isSetPayload() && change.getTransfer().getPayload().isSetStatusChanged()
+                && change.getTransfer().getPayload().getStatusChanged().isSetStatus();
     }
 
     @Override
     public void handle(Change change, SinkEvent event) {
         try {
+            Status status = change.getTransfer().getPayload().getStatusChanged().getStatus();
+
             log.info("Start deposit transfer status changed handling, eventId={}, depositId={}, transferChange={}", event.getId(), event.getSource(), change.getTransfer());
             Deposit deposit = depositDao.get(event.getSource());
-
-            long sourceId = deposit.getId();
 
             deposit.setId(null);
             deposit.setWtime(null);
@@ -50,12 +52,12 @@ public class DepositTransferStatusChangedHandler implements DepositEventHandler 
             deposit.setSequenceId(event.getPayload().getSequence());
             deposit.setEventOccuredAt(TypeUtil.stringToLocalDateTime(event.getPayload().getOccuredAt()));
             deposit.setEventType(DepositEventType.DEPOSIT_TRANSFER_STATUS_CHANGED);
-            deposit.setDepositTransferStatus(TBaseUtil.unionFieldToEnum(change.getTransfer().getStatusChanged(), DepositTransferStatus.class));
+            deposit.setDepositTransferStatus(TBaseUtil.unionFieldToEnum(status, DepositTransferStatus.class));
 
             depositDao.updateNotCurrent(event.getSource());
             long id = depositDao.save(deposit);
 
-            List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(sourceId, FistfulCashFlowChangeType.deposit);
+            List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(deposit.getId(), FistfulCashFlowChangeType.deposit);
             fillCashFlows(cashFlows, event, DepositEventType.DEPOSIT_TRANSFER_STATUS_CHANGED, id);
             fistfulCashFlowDao.save(cashFlows);
             log.info("Withdrawal deposit status have been changed, eventId={}, depositId={}, transferChange={}", event.getId(), event.getSource(), change.getTransfer());

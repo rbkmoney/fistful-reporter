@@ -38,7 +38,7 @@ public class SourceSinkEventTestUtils extends AbstractTestUtils {
     }
 
     private static Change createStatusChangedChange() {
-        return Change.status(StatusChange.changed(Status.authorized(new Authorized())));
+        return Change.status(new StatusChange(Status.authorized(new Authorized())));
     }
 
     private static Change createAccountCreatedChange(String identityId) {
