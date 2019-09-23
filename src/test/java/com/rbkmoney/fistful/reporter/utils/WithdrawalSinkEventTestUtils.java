@@ -4,14 +4,12 @@ import com.rbkmoney.easyway.AbstractTestUtils;
 import com.rbkmoney.fistful.withdrawal.*;
 import com.rbkmoney.fistful.withdrawal.status.Failed;
 import com.rbkmoney.fistful.withdrawal.status.Status;
-import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
-import lombok.SneakyThrows;
 
 import java.util.List;
 
-import static com.rbkmoney.fistful.reporter.utils.AbstractWithdrawalTestUtils.mockTBaseProcessor;
 import static com.rbkmoney.fistful.reporter.utils.TrasnferTestUtil.getCancelledPayload;
 import static com.rbkmoney.fistful.reporter.utils.TrasnferTestUtil.getCashFlowPayload;
+import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static java.util.Arrays.asList;
 
 public class WithdrawalSinkEventTestUtils extends AbstractTestUtils {
@@ -35,9 +33,8 @@ public class WithdrawalSinkEventTestUtils extends AbstractTestUtils {
         );
     }
 
-    @SneakyThrows
     private static Change createCreatedChange(String walletId) {
-        Withdrawal withdrawal = mockTBaseProcessor.process(new Withdrawal(), new TBaseHandler<>(Withdrawal.class));
+        Withdrawal withdrawal = random(Withdrawal.class, "context", "status");
         withdrawal.setSource(walletId);
         return Change.created(new CreatedChange(withdrawal));
     }

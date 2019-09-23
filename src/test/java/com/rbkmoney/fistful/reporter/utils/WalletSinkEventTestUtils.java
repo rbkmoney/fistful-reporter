@@ -3,12 +3,9 @@ package com.rbkmoney.fistful.reporter.utils;
 import com.rbkmoney.easyway.AbstractTestUtils;
 import com.rbkmoney.fistful.account.Account;
 import com.rbkmoney.fistful.wallet.*;
-import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
-import lombok.SneakyThrows;
 
 import java.util.List;
 
-import static com.rbkmoney.fistful.reporter.utils.AbstractWithdrawalTestUtils.mockTBaseProcessor;
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static java.util.Arrays.asList;
 
@@ -30,9 +27,8 @@ public class WalletSinkEventTestUtils extends AbstractTestUtils {
         );
     }
 
-    @SneakyThrows
     private static Change createCreatedChange() {
-        return Change.created(mockTBaseProcessor.process(new Wallet(), new TBaseHandler<>(Wallet.class)));
+        return Change.created(random(Wallet.class, "context", "account"));
     }
 
     private static Change createAccountCreatedChange(String identityId) {
