@@ -1,17 +1,17 @@
 package com.rbkmoney.fistful.reporter.dao.impl;
 
+import com.rbkmoney.dao.impl.AbstractGenericDao;
 import com.rbkmoney.fistful.reporter.dao.ReportDao;
 import com.rbkmoney.fistful.reporter.dao.mapper.RecordRowMapper;
 import com.rbkmoney.fistful.reporter.domain.enums.ReportStatus;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Report;
 import com.rbkmoney.fistful.reporter.domain.tables.records.ReportRecord;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
+import com.zaxxer.hikari.HikariDataSource;
 import org.jooq.Condition;
 import org.jooq.Query;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,13 +22,13 @@ public class ReportDaoImpl extends AbstractGenericDao implements ReportDao {
 
     private final RecordRowMapper<Report> reportRowMapper;
 
-    public ReportDaoImpl(DataSource dataSource) {
+    public ReportDaoImpl(HikariDataSource dataSource) {
         super(dataSource);
         reportRowMapper = new RecordRowMapper<>(REPORT, Report.class);
     }
 
     @Override
-    public long save(Report report) throws DaoException {
+    public long save(Report report) {
         ReportRecord record = getDslContext().newRecord(REPORT, report);
         Query query = getDslContext().insertInto(REPORT).set(record).returning(REPORT.ID);
 
@@ -38,7 +38,7 @@ public class ReportDaoImpl extends AbstractGenericDao implements ReportDao {
     }
 
     @Override
-    public List<Report> getReportsByRange(String partyId, String contractId, LocalDateTime fromTime, LocalDateTime toTime, List<String> reportTypes) throws DaoException {
+    public List<Report> getReportsByRange(String partyId, String contractId, LocalDateTime fromTime, LocalDateTime toTime, List<String> reportTypes) {
         Condition condition = REPORT.PARTY_ID.eq(partyId)
                 .and(REPORT.CONTRACT_ID.eq(contractId))
                 .and(REPORT.FROM_TIME.ge(fromTime))
@@ -55,7 +55,7 @@ public class ReportDaoImpl extends AbstractGenericDao implements ReportDao {
     }
 
     @Override
-    public Report getReport(long reportId, String partyId, String contractId) throws DaoException {
+    public Report getReport(long reportId, String partyId, String contractId) {
         Condition condition = REPORT.ID.eq(reportId)
                 .and(REPORT.PARTY_ID.eq(partyId))
                 .and(REPORT.CONTRACT_ID.eq(contractId));
@@ -65,7 +65,7 @@ public class ReportDaoImpl extends AbstractGenericDao implements ReportDao {
     }
 
     @Override
-    public void changeReportStatus(Long reportId, ReportStatus reportStatus) throws DaoException {
+    public void changeReportStatus(Long reportId, ReportStatus reportStatus) {
         Condition condition = REPORT.ID.eq(reportId);
         Query query = getDslContext().update(REPORT).set(REPORT.STATUS, reportStatus).where(condition);
 
@@ -73,7 +73,7 @@ public class ReportDaoImpl extends AbstractGenericDao implements ReportDao {
     }
 
     @Override
-    public List<Report> getPendingReports() throws DaoException {
+    public List<Report> getPendingReports() {
         Condition condition = REPORT.STATUS.eq(ReportStatus.pending);
         Query query = getDslContext().selectFrom(REPORT).where(condition).forUpdate();
 

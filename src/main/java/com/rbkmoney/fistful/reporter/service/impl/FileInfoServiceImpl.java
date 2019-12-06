@@ -1,8 +1,8 @@
 package com.rbkmoney.fistful.reporter.service.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.reporter.dao.FileInfoDao;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.FileInfo;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.service.FileInfoService;
 import lombok.RequiredArgsConstructor;
@@ -24,43 +24,49 @@ public class FileInfoServiceImpl implements FileInfoService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<Long> save(long reportId, List<String> fileDataIds) throws StorageException {
+    public List<Long> save(long reportId, List<String> fileDataIds) {
         List<Long> fileInfoIds = new ArrayList<>();
         for (String fileDataId : fileDataIds) {
-            fileInfoIds.add(save(reportId, fileDataId));
+            Long id = save(reportId, fileDataId);
+            fileInfoIds.add(id);
         }
         return fileInfoIds;
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public Long save(long reportId, String fileDataId) throws StorageException {
+    public Long save(long reportId, String fileDataId) {
         try {
             log.info("Trying to save file information, reportId='{}', fileDataId='{}'", reportId, fileDataId);
+
             FileInfo fileInfo = new FileInfo();
             fileInfo.setReportId(reportId);
             fileInfo.setFileDataId(fileDataId);
+
             Long id = fileInfoDao.save(fileInfo);
+
             log.info("File information have been saved, reportId='{}', fileDataId='{}'", reportId, fileDataId);
             return id;
-        } catch (DaoException e) {
-            throw new StorageException(e);
+        } catch (DaoException ex) {
+            throw new StorageException(String.format("Failed to save file info in storage, reportId=%s, fileDataId=%s", reportId, fileDataId), ex);
         }
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<String> getFileDataIds(long reportId) throws StorageException {
+    public List<String> getFileDataIds(long reportId) {
         try {
             log.info("Trying to get files information, reportId='{}'", reportId);
 
             List<String> fileIds = fileInfoDao.getByReportId(reportId).stream()
                     .map(FileInfo::getFileDataId)
                     .collect(Collectors.toList());
+
             log.info("Files information for report have been found, reportId='{}'", reportId);
+
             return fileIds;
-        } catch (DaoException e) {
-            throw new StorageException(e);
+        } catch (DaoException ex) {
+            throw new StorageException(String.format("Failed to get file info in storage, reportId=%s", reportId), ex);
         }
     }
 }

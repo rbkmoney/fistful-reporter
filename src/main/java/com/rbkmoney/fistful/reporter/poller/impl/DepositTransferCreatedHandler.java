@@ -1,5 +1,6 @@
 package com.rbkmoney.fistful.reporter.poller.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.cashflow.FinalCashFlowPosting;
 import com.rbkmoney.fistful.deposit.Change;
 import com.rbkmoney.fistful.deposit.SinkEvent;
@@ -11,10 +12,9 @@ import com.rbkmoney.fistful.reporter.domain.enums.FistfulCashFlowChangeType;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Deposit;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.FistfulCashFlow;
 import com.rbkmoney.fistful.reporter.dto.FistfulCashFlowSinkEvent;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.DepositEventHandler;
-import com.rbkmoney.fistful.reporter.util.CashFlowUtil;
+import com.rbkmoney.fistful.reporter.util.CashFlowConverter;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,13 +57,13 @@ public class DepositTransferCreatedHandler implements DepositEventHandler {
             deposit.setEventType(DepositEventType.DEPOSIT_TRANSFER_CREATED);
             deposit.setDepositTransferStatus(DepositTransferStatus.created);
 
-            deposit.setFee(CashFlowUtil.getFistfulFee(postings));
-            deposit.setProviderFee(CashFlowUtil.getFistfulProviderFee(postings));
+            deposit.setFee(CashFlowConverter.getFistfulFee(postings));
+            deposit.setProviderFee(CashFlowConverter.getFistfulProviderFee(postings));
 
             depositDao.updateNotCurrent(event.getSource());
             long id = depositDao.save(deposit);
 
-            List<FistfulCashFlow> fistfulCashFlows = CashFlowUtil.convertFistfulCashFlows(
+            List<FistfulCashFlow> fistfulCashFlows = CashFlowConverter.convertFistfulCashFlows(
                     new FistfulCashFlowSinkEvent(
                             event.getId(),
                             event.getCreatedAt(),

@@ -2,8 +2,7 @@ package com.rbkmoney.fistful.reporter;
 
 import com.rbkmoney.damsel.domain.Contract;
 import com.rbkmoney.file.storage.FileStorageSrv;
-import com.rbkmoney.fistful.reporter.component.ReportGenerator;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
+import com.rbkmoney.fistful.reporter.generator.ReportGenerator;
 import com.rbkmoney.fistful.reporter.service.PartyManagementService;
 import com.rbkmoney.fistful.reporter.service.ReportService;
 import com.rbkmoney.fistful.reporter.service.impl.WithdrawalRegistryTemplateServiceImpl;
@@ -64,7 +63,7 @@ public class FistfulReporterIntegrationTest extends AbstractAppFistfulReporterIn
     }
 
     @Test
-    public void fistfulReporterTest() throws TException, IOException, DaoException {
+    public void fistfulReporterTest() throws TException, IOException {
         jdbcTemplate.execute("truncate table fr.report cascade");
 
         when(partyManagementService.getContract(anyString(), anyString())).thenReturn(new Contract());

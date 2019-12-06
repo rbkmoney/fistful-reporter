@@ -1,5 +1,6 @@
 package com.rbkmoney.fistful.reporter.poller.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.base.BankCard;
 import com.rbkmoney.fistful.destination.Change;
 import com.rbkmoney.fistful.destination.Resource;
@@ -9,7 +10,6 @@ import com.rbkmoney.fistful.reporter.domain.enums.DestinationEventType;
 import com.rbkmoney.fistful.reporter.domain.enums.DestinationResourceType;
 import com.rbkmoney.fistful.reporter.domain.enums.DestinationStatus;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Destination;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.DestinationEventHandler;
 import com.rbkmoney.geck.common.util.TBaseUtil;

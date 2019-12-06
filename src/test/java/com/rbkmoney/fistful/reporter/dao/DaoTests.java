@@ -3,7 +3,6 @@ package com.rbkmoney.fistful.reporter.dao;
 import com.rbkmoney.fistful.reporter.domain.enums.FistfulCashFlowChangeType;
 import com.rbkmoney.fistful.reporter.domain.enums.ReportStatus;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.*;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -44,7 +43,7 @@ public class DaoTests extends AbstractAppDaoTests {
     private SourceDao sourceDao;
 
     @Test
-    public void challengeDaoTest() throws DaoException {
+    public void challengeDaoTest() {
         Challenge challenge = random(Challenge.class);
         challenge.setCurrent(true);
         Long id = challengeDao.save(challenge);
@@ -55,7 +54,7 @@ public class DaoTests extends AbstractAppDaoTests {
     }
 
     @Test
-    public void depositDaoTest() throws DaoException {
+    public void depositDaoTest() {
         Deposit deposit = random(Deposit.class);
         deposit.setCurrent(true);
         Long id = depositDao.save(deposit);
@@ -65,7 +64,7 @@ public class DaoTests extends AbstractAppDaoTests {
         assertNull(depositDao.get(deposit.getDepositId()));
     }
 
-    public void depositDaoDuplicationTest() throws DaoException {
+    public void depositDaoDuplicationTest() {
         Deposit deposit = random(Deposit.class);
         deposit.setCurrent(true);
         depositDao.updateNotCurrent(deposit.getDepositId());
@@ -79,7 +78,7 @@ public class DaoTests extends AbstractAppDaoTests {
     }
 
     @Test
-    public void destinationDaoTest() throws DaoException {
+    public void destinationDaoTest() {
         Destination destination = random(Destination.class);
         destination.setCurrent(true);
         Long id = destinationDao.save(destination);
@@ -90,7 +89,7 @@ public class DaoTests extends AbstractAppDaoTests {
     }
 
     @Test
-    public void fileInfoDaoTest() throws DaoException {
+    public void fileInfoDaoTest() {
         final int size = 4;
         long reportId;
         Report report = random(Report.class);
@@ -105,7 +104,7 @@ public class DaoTests extends AbstractAppDaoTests {
     }
 
     @Test
-    public void fistfulCashFlowDaoTest() throws DaoException {
+    public void fistfulCashFlowDaoTest() {
         FistfulCashFlowChangeType objType = FistfulCashFlowChangeType.deposit;
         int size = 4;
         long objId = generateLong();
@@ -119,7 +118,7 @@ public class DaoTests extends AbstractAppDaoTests {
     }
 
     @Test
-    public void identityDaoTest() throws DaoException {
+    public void identityDaoTest() {
         Identity identity = random(Identity.class);
         identity.setCurrent(true);
         Long id = identityDao.save(identity);
@@ -130,7 +129,7 @@ public class DaoTests extends AbstractAppDaoTests {
     }
 
     @Test
-    public void reportDaoTest() throws DaoException {
+    public void reportDaoTest() {
         jdbcTemplate.execute("truncate table fr.report cascade");
 
         Report report = random(Report.class);
@@ -155,7 +154,7 @@ public class DaoTests extends AbstractAppDaoTests {
     }
 
     @Test
-    public void sourceDaoTest() throws DaoException {
+    public void sourceDaoTest() {
         Source source = random(Source.class);
         source.setCurrent(true);
         Long id = sourceDao.save(source);
@@ -166,7 +165,7 @@ public class DaoTests extends AbstractAppDaoTests {
     }
 
     @Test
-    public void walletDaoTest() throws DaoException {
+    public void walletDaoTest() {
         Wallet wallet = random(Wallet.class);
         wallet.setCurrent(true);
         Long id = walletDao.save(wallet);
@@ -177,7 +176,7 @@ public class DaoTests extends AbstractAppDaoTests {
     }
 
     @Test
-    public void withdrawalDaoTest() throws DaoException {
+    public void withdrawalDaoTest() {
         Withdrawal withdrawal = random(Withdrawal.class);
         withdrawal.setCurrent(true);
         Long id = withdrawalDao.save(withdrawal);
@@ -188,7 +187,7 @@ public class DaoTests extends AbstractAppDaoTests {
     }
 
     @Test
-    public void takeSucceededWithdrawalsTest() throws DaoException {
+    public void takeSucceededWithdrawalsTest() {
         saveWithdrawalsDependencies();
         List<Withdrawal> withdrawalsByReport = withdrawalDao.getSucceededWithdrawalsByReport(report, 0L, 1000);
         assertEquals(getExpectedSize(), withdrawalsByReport.size());

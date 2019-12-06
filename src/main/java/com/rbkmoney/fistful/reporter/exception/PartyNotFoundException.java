@@ -1,6 +1,6 @@
 package com.rbkmoney.fistful.reporter.exception;
 
-public class PartyNotFoundException extends RuntimeException {
+public class PartyNotFoundException extends PartyManagementClientException {
 
     public PartyNotFoundException(String message) {
         super(message);

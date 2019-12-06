@@ -1,11 +1,11 @@
 package com.rbkmoney.fistful.reporter.poller.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.identity.Change;
 import com.rbkmoney.fistful.identity.SinkEvent;
 import com.rbkmoney.fistful.reporter.dao.IdentityDao;
 import com.rbkmoney.fistful.reporter.domain.enums.IdentityEventType;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Identity;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.IdentityEventHandler;
 import com.rbkmoney.geck.common.util.TypeUtil;

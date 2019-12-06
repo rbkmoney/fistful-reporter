@@ -1,8 +1,8 @@
-package com.rbkmoney.fistful.reporter.component;
+package com.rbkmoney.fistful.reporter.generator;
 
 import com.rbkmoney.fistful.reporter.domain.enums.ReportStatus;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Report;
-import com.rbkmoney.fistful.reporter.exception.StorageException;
+import com.rbkmoney.fistful.reporter.exception.ReportGeneratorException;
 import com.rbkmoney.fistful.reporter.service.FileInfoService;
 import com.rbkmoney.fistful.reporter.service.FileStorageService;
 import com.rbkmoney.fistful.reporter.service.ReportService;
@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -28,40 +29,41 @@ public class ReportGenerator {
     private final FileInfoService fileInfoService;
     private final FileStorageService fileStorageService;
 
-    public void generateReportFile(Report report) throws RuntimeException {
-        try {
-            logInfo("Start of report building, ", report);
+    public void generateReportFile(Report report) {
+        logInfo("Trying to build report, ", report);
 
-            List<String> fileDataIds = new ArrayList<>();
-            for (TemplateService templateService : templateServices) {
-                if (templateService.accept(report.getType())) {
-                    logInfo("Create temp report file, template type: " + templateService.getTemplateType() + "; report: ", report);
-                    Path reportFile = Files.createTempFile(getReportName(templateService), ".xlsx");
-                    try {
-                        logInfo("Fill temp report file in with data, template type: " + templateService.getTemplateType() + "; report: ", report);
-                        templateService.processReportFileByTemplate(report, Files.newOutputStream(reportFile));
+        List<String> fileDataIds = new ArrayList<>();
 
-                        logInfo("Save temp report file in file storage, template type: " + templateService.getTemplateType() + "; report: ", report);
-                        String fileDataId = fileStorageService.saveFile(reportFile);
+        List<TemplateService> templates = templateServices.stream()
+                .filter(templateService -> templateService.accept(report.getType()))
+                .collect(Collectors.toList());
 
-                        fileDataIds.add(fileDataId);
-                    } finally {
-                        logInfo("Delete temp report file, template type: " + templateService.getTemplateType() + "; report: ", report);
-                        Files.deleteIfExists(reportFile);
-                    }
+        for (TemplateService templateService : templates) {
+            try {
+                Path reportFile = Files.createTempFile(getReportName(templateService), ".xlsx");
+
+                try {
+                    logInfo("Fill report file, template type: " + templateService.getTemplateType() + "; report: ", report);
+                    templateService.processReportFileByTemplate(report, Files.newOutputStream(reportFile));
+
+                    logInfo("Upload report file , template type: " + templateService.getTemplateType() + "; report: ", report);
+                    String fileDataId = fileStorageService.saveFile(reportFile);
+
+                    fileDataIds.add(fileDataId);
+                } finally {
+                    Files.deleteIfExists(reportFile);
                 }
+            } catch (IOException ex) {
+                throw new ReportGeneratorException("File can not be written", ex);
             }
-
-            finishedReportTask(report, fileDataIds);
-
-            logInfo("Successfully end of report building, ", report);
-        } catch (Exception ex) {
-            logError("Failed end of report building, ", report, ex);
-            throw new RuntimeException(ex);
         }
+
+        finishedReportTask(report, fileDataIds);
+
+        logInfo("Report has been successfully built, ", report);
     }
 
-    private void finishedReportTask(Report report, List<String> fileDataIds) throws StorageException {
+    private void finishedReportTask(Report report, List<String> fileDataIds) {
         String fileDataIdsLog = fileDataIds.stream()
                 .collect(Collectors.joining(", ", "[", "]"));
 
@@ -79,11 +81,6 @@ public class ReportGenerator {
     private void logInfo(String message, Report report) {
         String format = getFormatMessage(message, report);
         log.info(format);
-    }
-
-    private void logError(String message, Report report, Exception ex) {
-        String format = getFormatMessage(message, report);
-        log.error(format, ex);
     }
 
     private String getFormatMessage(String message, Report report) {

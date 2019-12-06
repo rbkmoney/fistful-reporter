@@ -10,7 +10,6 @@ import com.rbkmoney.fistful.reporter.domain.tables.pojos.Identity;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Report;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Wallet;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Withdrawal;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.geck.serializer.kit.mock.MockMode;
 import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,7 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
 
     protected abstract int getExpectedSize();
 
-    protected void saveWithdrawalsDependencies() throws DaoException {
+    protected void saveWithdrawalsDependencies() {
         for (Identity identity : createIdentities(identityId, partyId, contractId)) {
             identityDao.save(identity);
         }

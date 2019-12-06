@@ -1,13 +1,13 @@
 package com.rbkmoney.fistful.reporter.poller.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.account.Account;
 import com.rbkmoney.fistful.reporter.dao.IdentityDao;
 import com.rbkmoney.fistful.reporter.dao.SourceDao;
 import com.rbkmoney.fistful.reporter.domain.enums.SourceEventType;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Identity;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Source;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
-import com.rbkmoney.fistful.reporter.exception.NotFoundException;
+import com.rbkmoney.fistful.reporter.exception.SinkEventNotFoundException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.SourceEventHandler;
 import com.rbkmoney.fistful.source.Change;
@@ -63,18 +63,18 @@ public class SourceAccountCreatedHandler implements SourceEventHandler {
         }
     }
 
-    private Source getSource(SinkEvent event) throws DaoException {
+    private Source getSource(SinkEvent event) {
         Source source = sourceDao.get(event.getSource());
         if (source == null) {
-            throw new NotFoundException(String.format("Source not found, sourceId='%s'", event.getSource()));
+            throw new SinkEventNotFoundException(String.format("Source not found, sourceId='%s'", event.getSource()));
         }
         return source;
     }
 
-    private Identity getIdentity(SinkEvent event, Account account) throws DaoException {
+    private Identity getIdentity(SinkEvent event, Account account) {
         Identity identity = identityDao.get(account.getIdentity());
         if (identity == null) {
-            throw new NotFoundException(String.format("Identity not found, sourceId='%s', identityId='%s'", event.getSource(), account.getIdentity()));
+            throw new SinkEventNotFoundException(String.format("Identity not found, sourceId='%s', identityId='%s'", event.getSource(), account.getIdentity()));
         }
         return identity;
     }

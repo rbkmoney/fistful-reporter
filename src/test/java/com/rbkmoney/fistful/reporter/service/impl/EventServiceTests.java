@@ -3,7 +3,6 @@ package com.rbkmoney.fistful.reporter.service.impl;
 import com.rbkmoney.fistful.reporter.dao.IdentityDao;
 import com.rbkmoney.fistful.reporter.dao.WalletDao;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.*;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.utils.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +44,7 @@ public class EventServiceTests extends AbstractAppEventServiceTests {
     private WithdrawalEventService withdrawalEventService;
 
     @Test
-    public void depositEventServiceTest() throws DaoException {
+    public void depositEventServiceTest() {
         String walletId = generateAndSaveWallet();
 
         String depositId = generateString();
@@ -67,7 +66,7 @@ public class EventServiceTests extends AbstractAppEventServiceTests {
     }
 
     @Test
-    public void destinationEventServiceTest() throws DaoException {
+    public void destinationEventServiceTest() {
         String identityId = generateAndSaveIdentity();
 
         String destinationId = generateString();
@@ -109,7 +108,7 @@ public class EventServiceTests extends AbstractAppEventServiceTests {
     }
 
     @Test
-    public void sourceEventServiceTest() throws DaoException {
+    public void sourceEventServiceTest() {
         String identityId = generateAndSaveIdentity();
 
         String sourceId = generateString();
@@ -131,7 +130,7 @@ public class EventServiceTests extends AbstractAppEventServiceTests {
     }
 
     @Test
-    public void walletEventServiceTest() throws DaoException {
+    public void walletEventServiceTest() {
         String identityId = generateAndSaveIdentity();
 
         String walletId = generateString();
@@ -153,7 +152,7 @@ public class EventServiceTests extends AbstractAppEventServiceTests {
     }
 
     @Test
-    public void withdrawalEventServiceTest() throws DaoException {
+    public void withdrawalEventServiceTest() {
         String walletId = generateAndSaveWallet();
 
         String withdrawalId = generateString();
@@ -174,7 +173,7 @@ public class EventServiceTests extends AbstractAppEventServiceTests {
         assertEquals(1, withdrawals.size());
     }
 
-    private String generateAndSaveIdentity() throws DaoException {
+    private String generateAndSaveIdentity() {
         String identityId = generateString();
         Identity identity = random(Identity.class);
         identity.setId(null);
@@ -184,7 +183,7 @@ public class EventServiceTests extends AbstractAppEventServiceTests {
         return identityId;
     }
 
-    private String generateAndSaveWallet() throws DaoException {
+    private String generateAndSaveWallet() {
         String walletId = generateString();
         Wallet wallet = random(Wallet.class);
         wallet.setId(null);

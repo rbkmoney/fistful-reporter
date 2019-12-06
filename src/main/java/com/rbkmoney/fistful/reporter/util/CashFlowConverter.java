@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class CashFlowUtil {
+public class CashFlowConverter {
 
     public static List<FistfulCashFlow> convertFistfulCashFlows(FistfulCashFlowSinkEvent event) {
         return event.getPostings().stream()

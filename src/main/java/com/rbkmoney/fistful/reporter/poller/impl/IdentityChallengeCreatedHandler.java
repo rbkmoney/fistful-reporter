@@ -1,5 +1,6 @@
 package com.rbkmoney.fistful.reporter.poller.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.identity.ChallengeChange;
 import com.rbkmoney.fistful.identity.ChallengeChangePayload;
 import com.rbkmoney.fistful.identity.Change;
@@ -11,7 +12,6 @@ import com.rbkmoney.fistful.reporter.domain.enums.ChallengeStatus;
 import com.rbkmoney.fistful.reporter.domain.enums.IdentityEventType;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Challenge;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Identity;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.IdentityEventHandler;
 import com.rbkmoney.geck.common.util.TypeUtil;
@@ -50,7 +50,7 @@ public class IdentityChallengeCreatedHandler implements IdentityEventHandler {
         }
     }
 
-    private ChallengeChange saveChallenge(Change change, SinkEvent event) throws DaoException {
+    private ChallengeChange saveChallenge(Change change, SinkEvent event) {
         ChallengeChange challengeChange = change.getIdentityChallenge();
 
         Challenge challenge = new Challenge();
@@ -72,7 +72,7 @@ public class IdentityChallengeCreatedHandler implements IdentityEventHandler {
         return challengeChange;
     }
 
-    private void updateIdentity(SinkEvent event) throws DaoException {
+    private void updateIdentity(SinkEvent event) {
         Identity identity = identityDao.get(event.getSource());
 
         identity.setId(null);

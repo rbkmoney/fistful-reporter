@@ -1,25 +1,15 @@
 package com.rbkmoney.fistful.reporter.util;
 
-import com.rbkmoney.fistful.reporter.InvalidRequest;
 import com.rbkmoney.fistful.reporter.Report;
 import com.rbkmoney.fistful.reporter.ReportStatus;
 import com.rbkmoney.fistful.reporter.ReportTimeRange;
 import com.rbkmoney.geck.common.util.TypeUtil;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class ThriftUtils {
 
-    public static InvalidRequest buildInvalidRequest(Throwable throwable) {
-        return buildInvalidRequest(throwable.getMessage());
-    }
-
-    public static InvalidRequest buildInvalidRequest(String... messages) {
-        return new InvalidRequest(Arrays.asList(messages));
-    }
-
-    public static Report map(com.rbkmoney.fistful.reporter.domain.tables.pojos.Report report, List<String> fileDataIds) throws IllegalArgumentException {
+    public static Report map(com.rbkmoney.fistful.reporter.domain.tables.pojos.Report report, List<String> fileDataIds) {
         Report dReport = new Report();
         dReport.setReportId(report.getId());
         dReport.setTimeRange(createTimeRange(report));

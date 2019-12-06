@@ -1,10 +1,10 @@
 package com.rbkmoney.fistful.reporter.poller.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.reporter.dao.SourceDao;
 import com.rbkmoney.fistful.reporter.domain.enums.SourceEventType;
 import com.rbkmoney.fistful.reporter.domain.enums.SourceStatus;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Source;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.SourceEventHandler;
 import com.rbkmoney.fistful.source.Change;

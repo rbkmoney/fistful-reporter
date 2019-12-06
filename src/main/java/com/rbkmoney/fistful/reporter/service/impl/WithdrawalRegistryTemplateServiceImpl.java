@@ -5,8 +5,8 @@ import com.rbkmoney.fistful.reporter.domain.tables.pojos.Withdrawal;
 import com.rbkmoney.fistful.reporter.dto.ReportType;
 import com.rbkmoney.fistful.reporter.service.TemplateService;
 import com.rbkmoney.fistful.reporter.service.WithdrawalService;
-import com.rbkmoney.fistful.reporter.util.FormatUtil;
-import com.rbkmoney.fistful.reporter.util.TimeUtil;
+import com.rbkmoney.fistful.reporter.util.FormatUtils;
+import com.rbkmoney.fistful.reporter.util.TimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -47,8 +47,8 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
     @Override
     public void processReportFileByTemplate(Report report, OutputStream outputStream) throws IOException {
         ZoneId reportZoneId = ZoneId.of(report.getTimezone());
-        String fromTime = TimeUtil.toLocalizedDate(report.getFromTime().toInstant(ZoneOffset.UTC), reportZoneId);
-        String toTime = TimeUtil.toLocalizedDate(report.getToTime().minusNanos(1).toInstant(ZoneOffset.UTC), reportZoneId);
+        String fromTime = TimeUtils.toLocalizedDate(report.getFromTime().toInstant(ZoneOffset.UTC), reportZoneId);
+        String toTime = TimeUtils.toLocalizedDate(report.getToTime().minusNanos(1).toInstant(ZoneOffset.UTC), reportZoneId);
         LongAdder inc = new LongAdder();
 
         // keep 100 rows in memory, exceeding rows will be flushed to disk
@@ -71,9 +71,9 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
                     row.createCell(0).setCellValue(getTime(withdrawal.getEventCreatedAt(), reportZoneId));
                     row.createCell(1).setCellValue(withdrawal.getWithdrawalId());
                     row.createCell(2).setCellValue(withdrawal.getWalletId());
-                    row.createCell(3).setCellValue(FormatUtil.formatCurrency(withdrawal.getAmount(), withdrawal.getCurrencyCode()));
+                    row.createCell(3).setCellValue(FormatUtils.formatCurrency(withdrawal.getAmount(), withdrawal.getCurrencyCode()));
                     row.createCell(4).setCellValue(withdrawal.getCurrencyCode());
-                    row.createCell(5).setCellValue(FormatUtil.formatCurrency(withdrawal.getFee(), withdrawal.getCurrencyCode()));
+                    row.createCell(5).setCellValue(FormatUtils.formatCurrency(withdrawal.getFee(), withdrawal.getCurrencyCode()));
                     row.createCell(6).setCellValue(withdrawal.getExternalId());
                     inc.increment();
                 }
@@ -160,6 +160,6 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
     }
 
     private String getTime(LocalDateTime localDateTime, ZoneId reportZoneId) {
-        return TimeUtil.toLocalizedDateTime(localDateTime.toInstant(ZoneOffset.UTC), reportZoneId);
+        return TimeUtils.toLocalizedDateTime(localDateTime.toInstant(ZoneOffset.UTC), reportZoneId);
     }
 }

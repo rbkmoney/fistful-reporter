@@ -1,10 +1,11 @@
 package com.rbkmoney.fistful.reporter.dao.impl;
 
+import com.rbkmoney.dao.impl.AbstractGenericDao;
 import com.rbkmoney.fistful.reporter.dao.DepositDao;
 import com.rbkmoney.fistful.reporter.dao.mapper.RecordRowMapper;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Deposit;
 import com.rbkmoney.fistful.reporter.domain.tables.records.DepositRecord;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
+import com.zaxxer.hikari.HikariDataSource;
 import org.jooq.Condition;
 import org.jooq.Query;
 import org.jooq.impl.DSL;
@@ -13,7 +14,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.util.Optional;
 
 import static com.rbkmoney.fistful.reporter.domain.tables.Deposit.DEPOSIT;
@@ -24,20 +24,20 @@ public class DepositDaoImpl extends AbstractGenericDao implements DepositDao {
     private final RowMapper<Deposit> depositRowMapper;
 
     @Autowired
-    public DepositDaoImpl(DataSource dataSource) {
+    public DepositDaoImpl(HikariDataSource dataSource) {
         super(dataSource);
         depositRowMapper = new RecordRowMapper<>(DEPOSIT, Deposit.class);
     }
 
     @Override
-    public Optional<Long> getLastEventId() throws DaoException {
+    public Optional<Long> getLastEventId() {
         Query query = getDslContext().select(DSL.max(DEPOSIT.EVENT_ID)).from(DEPOSIT);
 
         return Optional.ofNullable(fetchOne(query, Long.class));
     }
 
     @Override
-    public Long save(Deposit deposit) throws DaoException {
+    public Long save(Deposit deposit) {
         DepositRecord record = getDslContext().newRecord(DEPOSIT, deposit);
         Query query = getDslContext().insertInto(DEPOSIT).set(record).returning(DEPOSIT.ID);
 
@@ -47,7 +47,7 @@ public class DepositDaoImpl extends AbstractGenericDao implements DepositDao {
     }
 
     @Override
-    public Deposit get(String depositId) throws DaoException {
+    public Deposit get(String depositId) {
         Condition condition = DEPOSIT.DEPOSIT_ID.eq(depositId)
                 .and(DEPOSIT.CURRENT);
         Query query = getDslContext().selectFrom(DEPOSIT).where(condition);
@@ -56,7 +56,7 @@ public class DepositDaoImpl extends AbstractGenericDao implements DepositDao {
     }
 
     @Override
-    public void updateNotCurrent(String depositId) throws DaoException {
+    public void updateNotCurrent(String depositId) {
         Condition condition = DEPOSIT.DEPOSIT_ID.eq(depositId)
                 .and(DEPOSIT.CURRENT);
         Query query = getDslContext().update(DEPOSIT).set(DEPOSIT.CURRENT, false).where(condition);

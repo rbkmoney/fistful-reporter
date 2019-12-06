@@ -1,9 +1,9 @@
 package com.rbkmoney.fistful.reporter.service.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.reporter.dao.WithdrawalDao;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Report;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Withdrawal;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.service.WithdrawalService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class WithdrawalServiceImpl implements WithdrawalService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<Withdrawal> getSucceededWithdrawalsByReport(Report report) throws StorageException {
+    public List<Withdrawal> getSucceededWithdrawalsByReport(Report report) {
         try {
             log.info("Trying to get succeeded withdrawals by report, " +
                             "reportId={}, partyId={}, contractId={}",

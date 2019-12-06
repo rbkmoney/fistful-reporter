@@ -1,7 +1,7 @@
 package com.rbkmoney.fistful.reporter.service.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.reporter.dao.WithdrawalDao;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.WithdrawalEventHandler;
 import com.rbkmoney.fistful.reporter.service.EventService;

@@ -1,10 +1,11 @@
 package com.rbkmoney.fistful.reporter.dao.impl;
 
+import com.rbkmoney.dao.impl.AbstractGenericDao;
 import com.rbkmoney.fistful.reporter.dao.SourceDao;
 import com.rbkmoney.fistful.reporter.dao.mapper.RecordRowMapper;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Source;
 import com.rbkmoney.fistful.reporter.domain.tables.records.SourceRecord;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
+import com.zaxxer.hikari.HikariDataSource;
 import org.jooq.Condition;
 import org.jooq.Query;
 import org.jooq.impl.DSL;
@@ -13,7 +14,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.util.Optional;
 
 import static com.rbkmoney.fistful.reporter.domain.tables.Source.SOURCE;
@@ -24,20 +24,20 @@ public class SourceDaoImpl extends AbstractGenericDao implements SourceDao {
     private final RowMapper<Source> sourceRowMapper;
 
     @Autowired
-    public SourceDaoImpl(DataSource dataSource) {
+    public SourceDaoImpl(HikariDataSource dataSource) {
         super(dataSource);
         sourceRowMapper = new RecordRowMapper<>(SOURCE, Source.class);
     }
 
     @Override
-    public Optional<Long> getLastEventId() throws DaoException {
+    public Optional<Long> getLastEventId() {
         Query query = getDslContext().select(DSL.max(SOURCE.EVENT_ID)).from(SOURCE);
 
         return Optional.ofNullable(fetchOne(query, Long.class));
     }
 
     @Override
-    public Long save(Source source) throws DaoException {
+    public Long save(Source source) {
         SourceRecord record = getDslContext().newRecord(SOURCE, source);
         Query query = getDslContext().insertInto(SOURCE).set(record).returning(SOURCE.ID);
 
@@ -47,7 +47,7 @@ public class SourceDaoImpl extends AbstractGenericDao implements SourceDao {
     }
 
     @Override
-    public Source get(String sourceId) throws DaoException {
+    public Source get(String sourceId) {
         Condition condition = SOURCE.SOURCE_ID.eq(sourceId)
                 .and(SOURCE.CURRENT);
         Query query = getDslContext().selectFrom(SOURCE).where(condition);
@@ -56,7 +56,7 @@ public class SourceDaoImpl extends AbstractGenericDao implements SourceDao {
     }
 
     @Override
-    public void updateNotCurrent(String sourceId) throws DaoException {
+    public void updateNotCurrent(String sourceId) {
         Condition condition = SOURCE.SOURCE_ID.eq(sourceId)
                 .and(SOURCE.CURRENT);
         Query query = getDslContext().update(SOURCE).set(SOURCE.CURRENT, false).where(condition);

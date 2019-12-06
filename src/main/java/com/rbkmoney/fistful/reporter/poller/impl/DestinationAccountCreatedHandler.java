@@ -1,5 +1,6 @@
 package com.rbkmoney.fistful.reporter.poller.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.account.Account;
 import com.rbkmoney.fistful.destination.Change;
 import com.rbkmoney.fistful.destination.SinkEvent;
@@ -8,8 +9,7 @@ import com.rbkmoney.fistful.reporter.dao.IdentityDao;
 import com.rbkmoney.fistful.reporter.domain.enums.DestinationEventType;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Destination;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Identity;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
-import com.rbkmoney.fistful.reporter.exception.NotFoundException;
+import com.rbkmoney.fistful.reporter.exception.SinkEventNotFoundException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.DestinationEventHandler;
 import com.rbkmoney.geck.common.util.TypeUtil;
@@ -64,18 +64,18 @@ public class DestinationAccountCreatedHandler implements DestinationEventHandler
         }
     }
 
-    private Destination getDestination(SinkEvent event) throws DaoException {
+    private Destination getDestination(SinkEvent event) {
         Destination destination = destinationDao.get(event.getSource());
         if (destination == null) {
-            throw new NotFoundException(String.format("Destination not found, destinationId='%s'", event.getSource()));
+            throw new SinkEventNotFoundException(String.format("Destination not found, destinationId='%s'", event.getSource()));
         }
         return destination;
     }
 
-    private Identity getIdentity(SinkEvent event, Account account) throws DaoException {
+    private Identity getIdentity(SinkEvent event, Account account) {
         Identity identity = identityDao.get(account.getIdentity());
         if (identity == null) {
-            throw new NotFoundException(String.format("Identity not found, destinationId='%s', identityId='%s'", event.getSource(), account.getIdentity()));
+            throw new SinkEventNotFoundException(String.format("Identity not found, destinationId='%s', identityId='%s'", event.getSource(), account.getIdentity()));
         }
         return identity;
     }

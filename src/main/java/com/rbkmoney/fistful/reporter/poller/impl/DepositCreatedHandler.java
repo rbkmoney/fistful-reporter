@@ -1,5 +1,6 @@
 package com.rbkmoney.fistful.reporter.poller.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.base.Cash;
 import com.rbkmoney.fistful.deposit.Change;
 import com.rbkmoney.fistful.deposit.SinkEvent;
@@ -9,8 +10,7 @@ import com.rbkmoney.fistful.reporter.domain.enums.DepositEventType;
 import com.rbkmoney.fistful.reporter.domain.enums.DepositStatus;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Deposit;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Wallet;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
-import com.rbkmoney.fistful.reporter.exception.NotFoundException;
+import com.rbkmoney.fistful.reporter.exception.SinkEventNotFoundException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.DepositEventHandler;
 import com.rbkmoney.geck.common.util.TypeUtil;
@@ -68,10 +68,10 @@ public class DepositCreatedHandler implements DepositEventHandler {
         }
     }
 
-    private Wallet getWallet(SinkEvent event, String walletId) throws DaoException {
+    private Wallet getWallet(SinkEvent event, String walletId) {
         Wallet wallet = walletDao.get(walletId);
         if (wallet == null) {
-            throw new NotFoundException(String.format("Wallet not found, destinationId='%s', walletId='%s'", event.getSource(), walletId));
+            throw new SinkEventNotFoundException(String.format("Wallet not found, destinationId='%s', walletId='%s'", event.getSource(), walletId));
         }
         return wallet;
     }

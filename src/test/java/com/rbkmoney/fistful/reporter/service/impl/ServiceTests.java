@@ -7,7 +7,6 @@ import com.rbkmoney.file.storage.FileStorageSrv;
 import com.rbkmoney.fistful.reporter.domain.enums.ReportStatus;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Report;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Withdrawal;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.service.*;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -113,7 +112,7 @@ public class ServiceTests extends AbstractAppServiceTests {
         Mockito.when(partyManagementClient.checkout(userInfo, party.getId(), revision))
                 .thenReturn(party);
 
-        Contract c = partyManagementService.getContract(party.getId(), contract.getId(), revision);
+        Contract c = partyManagementService.getContract(party.getId(), contract.getId());
         Assert.assertEquals(contract, c);
         Party p = partyManagementService.getParty(party.getId(), revision);
         Assert.assertEquals(party, p);
@@ -188,7 +187,7 @@ public class ServiceTests extends AbstractAppServiceTests {
     }
 
     @Test
-    public void withdrawalServiceTest() throws DaoException {
+    public void withdrawalServiceTest() {
         saveWithdrawalsDependencies();
 
         List<Withdrawal> withdrawals = withdrawalService.getSucceededWithdrawalsByReport(report);

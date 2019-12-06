@@ -1,10 +1,10 @@
 package com.rbkmoney.fistful.reporter.service.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.reporter.config.properties.ReportingProperties;
 import com.rbkmoney.fistful.reporter.dao.ReportDao;
 import com.rbkmoney.fistful.reporter.domain.enums.ReportStatus;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Report;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.exception.ReportNotFoundException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.service.ReportService;
@@ -31,13 +31,13 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public long createReport(String partyId, String contractId, Instant fromTime, Instant toTime, String reportType) throws StorageException {
+    public long createReport(String partyId, String contractId, Instant fromTime, Instant toTime, String reportType) {
         return createReport(partyId, contractId, fromTime, toTime, reportType, reportingProperties.getDefaultTimeZone(), Instant.now());
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<Report> getReportsByRange(String partyId, String contractId, Instant fromTime, Instant toTime, List<String> reportTypes) throws StorageException {
+    public List<Report> getReportsByRange(String partyId, String contractId, Instant fromTime, Instant toTime, List<String> reportTypes) {
         try {
             log.info("Trying to get reports by range, partyId={}, contractId={}", partyId, contractId);
             List<Report> reportsByRange = reportDao.getReportsByRange(
@@ -62,7 +62,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<Report> getReportsByRangeNotCancelled(String partyId, String contractId, Instant fromTime, Instant toTime, List<String> reportTypes) throws StorageException {
+    public List<Report> getReportsByRangeNotCancelled(String partyId, String contractId, Instant fromTime, Instant toTime, List<String> reportTypes) {
         return getReportsByRange(partyId, contractId, fromTime, toTime, reportTypes).stream()
                 .filter(report -> report.getStatus() != ReportStatus.cancelled)
                 .collect(Collectors.toList());
@@ -70,7 +70,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public Report getReport(String partyId, String contractId, long reportId) throws ReportNotFoundException, StorageException {
+    public Report getReport(String partyId, String contractId, long reportId) {
         try {
             log.info("Trying to get report, reportId={}, partyId={}, contractId={}", reportId, partyId, contractId);
             Report report = reportDao.getReport(reportId, partyId, contractId);
@@ -92,7 +92,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void cancelReport(String partyId, String shopId, long reportId) throws ReportNotFoundException, StorageException {
+    public void cancelReport(String partyId, String shopId, long reportId) {
         log.info("Trying to cancel report, reportId='{}'", reportId);
         Report report = getReport(partyId, shopId, reportId);
         changeReportStatus(report, ReportStatus.cancelled);
@@ -101,7 +101,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void changeReportStatus(Report report, ReportStatus reportStatus) throws StorageException {
+    public void changeReportStatus(Report report, ReportStatus reportStatus) {
         try {
             log.info("Trying to change report status, reportId='{}', reportStatus='{}'", report.getId(), reportStatus);
             reportDao.changeReportStatus(report.getId(), reportStatus);
@@ -113,7 +113,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<Report> getPendingReports() throws StorageException {
+    public List<Report> getPendingReports() {
         try {
             log.info("Trying to get pending reports");
             List<Report> pendingReports = reportDao.getPendingReports();
@@ -124,7 +124,7 @@ public class ReportServiceImpl implements ReportService {
         }
     }
 
-    private long createReport(String partyId, String contractId, Instant fromTime, Instant toTime, String reportType, ZoneId timezone, Instant createdAt) throws StorageException {
+    private long createReport(String partyId, String contractId, Instant fromTime, Instant toTime, String reportType, ZoneId timezone, Instant createdAt) {
         try {
             log.info(
                     "Trying to create report, partyId={}, contractId={}, reportType={}, fromTime={}, toTime={}",

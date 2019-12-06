@@ -1,8 +1,8 @@
 package com.rbkmoney.fistful.reporter.handler;
 
-import com.rbkmoney.fistful.reporter.component.ReportGenerator;
 import com.rbkmoney.fistful.reporter.config.properties.ReportingProperties;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Report;
+import com.rbkmoney.fistful.reporter.generator.ReportGenerator;
 import com.rbkmoney.fistful.reporter.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +24,16 @@ public class FistfulReportsScheduler {
 
     @Scheduled(fixedDelayString = "${reporting.pollingDelay:3000}")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void processPendingReports() throws RuntimeException {
+    public void processPendingReports() {
         if (reportingProperties.isPollingEnable()) {
-            List<Report> reports = reportService.getPendingReports();
-            for (Report report : reports) {
-                reportGenerator.generateReportFile(report);
+            try {
+                List<Report> reports = reportService.getPendingReports();
+                for (Report report : reports) {
+                    reportGenerator.generateReportFile(report);
+                }
+            } catch (Throwable ex) {
+                log.warn("Error with FistfulReportsScheduler", ex);
+                throw ex;
             }
         }
     }

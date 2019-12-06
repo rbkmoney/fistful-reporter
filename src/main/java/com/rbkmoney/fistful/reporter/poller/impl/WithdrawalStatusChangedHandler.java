@@ -1,5 +1,6 @@
 package com.rbkmoney.fistful.reporter.poller.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.reporter.dao.FistfulCashFlowDao;
 import com.rbkmoney.fistful.reporter.dao.WithdrawalDao;
 import com.rbkmoney.fistful.reporter.domain.enums.FistfulCashFlowChangeType;
@@ -7,7 +8,6 @@ import com.rbkmoney.fistful.reporter.domain.enums.WithdrawalEventType;
 import com.rbkmoney.fistful.reporter.domain.enums.WithdrawalStatus;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.FistfulCashFlow;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Withdrawal;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.WithdrawalEventHandler;
 import com.rbkmoney.fistful.withdrawal.Change;

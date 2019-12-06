@@ -1,5 +1,6 @@
 package com.rbkmoney.fistful.reporter.poller.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.cashflow.FinalCashFlowPosting;
 import com.rbkmoney.fistful.reporter.dao.FistfulCashFlowDao;
 import com.rbkmoney.fistful.reporter.dao.WithdrawalDao;
@@ -9,10 +10,9 @@ import com.rbkmoney.fistful.reporter.domain.enums.WithdrawalTransferStatus;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.FistfulCashFlow;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Withdrawal;
 import com.rbkmoney.fistful.reporter.dto.FistfulCashFlowSinkEvent;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.WithdrawalEventHandler;
-import com.rbkmoney.fistful.reporter.util.CashFlowUtil;
+import com.rbkmoney.fistful.reporter.util.CashFlowConverter;
 import com.rbkmoney.fistful.withdrawal.Change;
 import com.rbkmoney.fistful.withdrawal.SinkEvent;
 import com.rbkmoney.geck.common.util.TypeUtil;
@@ -55,13 +55,13 @@ public class WithdrawalTransferCreatedHandler implements WithdrawalEventHandler 
             withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_TRANSFER_CREATED);
             withdrawal.setWithdrawalTransferStatus(WithdrawalTransferStatus.created);
 
-            withdrawal.setFee(CashFlowUtil.getFistfulFee(postings));
-            withdrawal.setProviderFee(CashFlowUtil.getFistfulProviderFee(postings));
+            withdrawal.setFee(CashFlowConverter.getFistfulFee(postings));
+            withdrawal.setProviderFee(CashFlowConverter.getFistfulProviderFee(postings));
 
             withdrawalDao.updateNotCurrent(event.getSource());
             long id = withdrawalDao.save(withdrawal);
 
-            List<FistfulCashFlow> fistfulCashFlows = CashFlowUtil.convertFistfulCashFlows(
+            List<FistfulCashFlow> fistfulCashFlows = CashFlowConverter.convertFistfulCashFlows(
                     new FistfulCashFlowSinkEvent(
                             event.getId(),
                             event.getCreatedAt(),

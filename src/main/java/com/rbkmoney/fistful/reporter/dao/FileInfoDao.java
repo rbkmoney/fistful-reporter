@@ -1,13 +1,13 @@
 package com.rbkmoney.fistful.reporter.dao;
 
+import com.rbkmoney.dao.GenericDao;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.FileInfo;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 
 import java.util.List;
 
 public interface FileInfoDao extends GenericDao {
 
-    Long save(FileInfo fileInfo) throws DaoException;
+    Long save(FileInfo fileInfo);
 
-    List<FileInfo> getByReportId(Long reportId) throws DaoException;
+    List<FileInfo> getByReportId(Long reportId);
 }

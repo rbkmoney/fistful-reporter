@@ -1,13 +1,13 @@
 package com.rbkmoney.fistful.reporter.poller.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.account.Account;
 import com.rbkmoney.fistful.reporter.dao.IdentityDao;
 import com.rbkmoney.fistful.reporter.dao.WalletDao;
 import com.rbkmoney.fistful.reporter.domain.enums.WalletEventType;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Identity;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Wallet;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
-import com.rbkmoney.fistful.reporter.exception.NotFoundException;
+import com.rbkmoney.fistful.reporter.exception.SinkEventNotFoundException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.WalletEventHandler;
 import com.rbkmoney.fistful.wallet.Change;
@@ -63,18 +63,18 @@ public class WalletAccountCreatedHandler implements WalletEventHandler {
         }
     }
 
-    private Identity getIdentity(SinkEvent event, Account account) throws DaoException {
+    private Identity getIdentity(SinkEvent event, Account account) {
         Identity identity = identityDao.get(account.getIdentity());
         if (identity == null) {
-            throw new NotFoundException(String.format("Identity not found, walletId='%s', identityId='%s'", event.getSource(), account.getIdentity()));
+            throw new SinkEventNotFoundException(String.format("Identity not found, walletId='%s', identityId='%s'", event.getSource(), account.getIdentity()));
         }
         return identity;
     }
 
-    private Wallet getWallet(SinkEvent event) throws DaoException {
+    private Wallet getWallet(SinkEvent event) {
         Wallet wallet = walletDao.get(event.getSource());
         if (wallet == null) {
-            throw new NotFoundException(String.format("Wallet not found, walletId='%s'", event.getSource()));
+            throw new SinkEventNotFoundException(String.format("Wallet not found, walletId='%s'", event.getSource()));
         }
         return wallet;
     }

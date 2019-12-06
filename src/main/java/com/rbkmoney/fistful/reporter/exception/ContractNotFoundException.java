@@ -1,6 +1,6 @@
 package com.rbkmoney.fistful.reporter.exception;
 
-public class ContractNotFoundException extends RuntimeException {
+public class ContractNotFoundException extends PartyManagementClientException {
 
     public ContractNotFoundException(String message) {
         super(message);

@@ -1,5 +1,6 @@
 package com.rbkmoney.fistful.reporter.poller.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.deposit.Change;
 import com.rbkmoney.fistful.deposit.SinkEvent;
 import com.rbkmoney.fistful.deposit.status.Status;
@@ -10,7 +11,6 @@ import com.rbkmoney.fistful.reporter.domain.enums.DepositStatus;
 import com.rbkmoney.fistful.reporter.domain.enums.FistfulCashFlowChangeType;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Deposit;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.FistfulCashFlow;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.DepositEventHandler;
 import com.rbkmoney.geck.common.util.TBaseUtil;

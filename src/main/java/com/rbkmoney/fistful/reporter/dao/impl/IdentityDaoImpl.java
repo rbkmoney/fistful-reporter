@@ -1,10 +1,11 @@
 package com.rbkmoney.fistful.reporter.dao.impl;
 
+import com.rbkmoney.dao.impl.AbstractGenericDao;
 import com.rbkmoney.fistful.reporter.dao.IdentityDao;
 import com.rbkmoney.fistful.reporter.dao.mapper.RecordRowMapper;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Identity;
 import com.rbkmoney.fistful.reporter.domain.tables.records.IdentityRecord;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
+import com.zaxxer.hikari.HikariDataSource;
 import org.jooq.Condition;
 import org.jooq.Query;
 import org.jooq.impl.DSL;
@@ -13,7 +14,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.util.Optional;
 
 import static com.rbkmoney.fistful.reporter.domain.tables.Challenge.CHALLENGE;
@@ -27,13 +27,13 @@ public class IdentityDaoImpl extends AbstractGenericDao implements IdentityDao {
     private final RowMapper<Identity> identityRowMapper;
 
     @Autowired
-    public IdentityDaoImpl(DataSource dataSource) {
+    public IdentityDaoImpl(HikariDataSource dataSource) {
         super(dataSource);
         identityRowMapper = new RecordRowMapper<>(IDENTITY, Identity.class);
     }
 
     @Override
-    public Optional<Long> getLastEventId() throws DaoException {
+    public Optional<Long> getLastEventId() {
         Query query = getDslContext().select(DSL.max(DSL.field(EVENT_ID)))
                 .from(
                         getDslContext().select(DSL.max(IDENTITY.EVENT_ID).as(EVENT_ID))
@@ -48,7 +48,7 @@ public class IdentityDaoImpl extends AbstractGenericDao implements IdentityDao {
     }
 
     @Override
-    public Long save(Identity identity) throws DaoException {
+    public Long save(Identity identity) {
         IdentityRecord record = getDslContext().newRecord(IDENTITY, identity);
         Query query = getDslContext().insertInto(IDENTITY).set(record).returning(IDENTITY.ID);
 
@@ -58,7 +58,7 @@ public class IdentityDaoImpl extends AbstractGenericDao implements IdentityDao {
     }
 
     @Override
-    public Identity get(String identityId) throws DaoException {
+    public Identity get(String identityId) {
         Condition condition = IDENTITY.IDENTITY_ID.eq(identityId)
                 .and(IDENTITY.CURRENT);
         Query query = getDslContext().selectFrom(IDENTITY).where(condition);
@@ -67,7 +67,7 @@ public class IdentityDaoImpl extends AbstractGenericDao implements IdentityDao {
     }
 
     @Override
-    public void updateNotCurrent(String identityId) throws DaoException {
+    public void updateNotCurrent(String identityId) {
         Condition condition = IDENTITY.IDENTITY_ID.eq(identityId)
                 .and(IDENTITY.CURRENT);
         Query query = getDslContext().update(IDENTITY).set(IDENTITY.CURRENT, false).where(condition);

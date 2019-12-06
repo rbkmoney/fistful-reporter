@@ -1,9 +1,9 @@
 package com.rbkmoney.fistful.reporter.service.impl;
 
+import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.deposit.Change;
 import com.rbkmoney.fistful.deposit.SinkEvent;
 import com.rbkmoney.fistful.reporter.dao.DepositDao;
-import com.rbkmoney.fistful.reporter.exception.DaoException;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.poller.DepositEventHandler;
 import com.rbkmoney.fistful.reporter.service.EventService;
