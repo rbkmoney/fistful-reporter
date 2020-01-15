@@ -38,7 +38,7 @@ public class DepositCreatedHandler implements DepositEventHandler {
 
             log.info("Start deposit created handling, eventId={}, depositId={}", event.getId(), event.getSource());
 
-            Wallet wallet = getWallet(event, depositDamsel.getWallet());
+            Wallet wallet = getWallet(event, depositDamsel.getWalletId());
 
             Deposit deposit = new Deposit();
 
@@ -48,8 +48,8 @@ public class DepositCreatedHandler implements DepositEventHandler {
             deposit.setSequenceId(event.getPayload().getSequence());
             deposit.setEventOccuredAt(TypeUtil.stringToLocalDateTime(event.getPayload().getOccuredAt()));
             deposit.setEventType(DepositEventType.DEPOSIT_CREATED);
-            deposit.setWalletId(depositDamsel.getWallet());
-            deposit.setSourceId(depositDamsel.getSource());
+            deposit.setWalletId(depositDamsel.getWalletId());
+            deposit.setSourceId(depositDamsel.getSourceId());
             deposit.setDepositStatus(DepositStatus.pending);
 
             deposit.setPartyId(wallet.getPartyId());

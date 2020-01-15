@@ -21,19 +21,19 @@ public class DepositSinkEventTestUtils extends AbstractTestUtils {
                 createTransferCreatedChange(),
                 createTransferStatusChangedChange()
         );
-        Event event = new Event(generateInt(), generateDate(), changes);
+        EventSinkPayload eventSinkPayload = new EventSinkPayload(generateInt(), generateDate(), changes);
 
         return new SinkEvent(
                 generateLong(),
                 generateDate(),
                 depositId,
-                event
+                eventSinkPayload
         );
     }
 
     private static Change createCreatedChange(String walletId) {
         Deposit deposit = random(Deposit.class, "status");
-        deposit.setWallet(walletId);
+        deposit.setWalletId(walletId);
         return Change.created(new CreatedChange(deposit));
     }
 

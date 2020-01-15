@@ -38,7 +38,7 @@ public class WithdrawalCreatedHandler implements WithdrawalEventHandler {
 
             log.info("Start withdrawal created handling, eventId={}, walletId={}", event.getId(), event.getSource());
 
-            Wallet wallet = getWallet(event, withdrawalDamsel.getSource());
+            Wallet wallet = getWallet(event, withdrawalDamsel.getId());
 
             Withdrawal withdrawal = new Withdrawal();
             withdrawal.setExternalId(withdrawalDamsel.getExternalId());
@@ -48,8 +48,8 @@ public class WithdrawalCreatedHandler implements WithdrawalEventHandler {
             withdrawal.setSequenceId(event.getPayload().getSequence());
             withdrawal.setEventOccuredAt(TypeUtil.stringToLocalDateTime(event.getPayload().getOccuredAt()));
             withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_CREATED);
-            withdrawal.setWalletId(withdrawalDamsel.getSource());
-            withdrawal.setDestinationId(withdrawalDamsel.getDestination());
+            withdrawal.setWalletId(withdrawalDamsel.getId());
+            withdrawal.setDestinationId(withdrawalDamsel.getDestinationId());
             withdrawal.setWithdrawalStatus(WithdrawalStatus.pending);
 
             withdrawal.setPartyId(wallet.getPartyId());

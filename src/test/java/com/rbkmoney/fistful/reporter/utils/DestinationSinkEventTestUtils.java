@@ -1,5 +1,6 @@
 package com.rbkmoney.fistful.reporter.utils;
 
+import com.rbkmoney.damsel.domain.Bank;
 import com.rbkmoney.easyway.AbstractTestUtils;
 import com.rbkmoney.fistful.account.Account;
 import com.rbkmoney.fistful.base.BankCard;
@@ -40,10 +41,11 @@ public class DestinationSinkEventTestUtils extends AbstractTestUtils {
     }
 
     private static Change createCreatedChange() {
+        BankCard bankCard = random(BankCard.class, BankCard._Fields.BIN_DATA_ID.getFieldName());
         return Change.created(
                 new com.rbkmoney.fistful.destination.Destination(
                         generateString(),
-                        Resource.bank_card(random(BankCard.class))
+                        Resource.bank_card(bankCard)
                 )
         );
     }
