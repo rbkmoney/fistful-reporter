@@ -48,7 +48,7 @@ public class WithdrawalCreatedHandler implements WithdrawalEventHandler {
             withdrawal.setSequenceId(event.getPayload().getSequence());
             withdrawal.setEventOccuredAt(TypeUtil.stringToLocalDateTime(event.getPayload().getOccuredAt()));
             withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_CREATED);
-            withdrawal.setWalletId(withdrawalDamsel.getId());
+            withdrawal.setWalletId(withdrawalDamsel.getWalletId());
             withdrawal.setDestinationId(withdrawalDamsel.getDestinationId());
             withdrawal.setWithdrawalStatus(WithdrawalStatus.pending);
 
