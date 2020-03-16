@@ -81,6 +81,7 @@ public abstract class AbstractCephConfig extends AbstractTestUtils {
     private static Consumer<EnvironmentProperties> getEnvironmentPropertiesConsumer() {
         return environmentProperties -> {
             environmentProperties.put("eventstock.pollingEnable", "false");
+            environmentProperties.put("reporting.pollingEnable", "false");
         };
     }
 }

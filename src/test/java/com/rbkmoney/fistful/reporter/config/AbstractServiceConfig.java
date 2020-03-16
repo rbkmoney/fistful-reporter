@@ -80,6 +80,7 @@ public abstract class AbstractServiceConfig extends AbstractWithdrawalTestUtils 
     private static Consumer<EnvironmentProperties> getEnvironmentPropertiesConsumer() {
         return environmentProperties -> {
             environmentProperties.put("eventstock.pollingEnable", "false");
+            environmentProperties.put("reporting.pollingEnable", "false");
         };
     }
 }

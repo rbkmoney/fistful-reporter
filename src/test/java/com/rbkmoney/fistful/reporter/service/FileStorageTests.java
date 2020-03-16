@@ -31,6 +31,7 @@ public class FileStorageTests extends AbstractCephConfig {
     @Autowired
     private FileStorageSrv.Iface client;
 
+    // не работает локально на маке
     @Test
     public void uploadAndDownloadTestTest() throws URISyntaxException, IOException, TException, InterruptedException {
         Path file = getFileFromResources();
