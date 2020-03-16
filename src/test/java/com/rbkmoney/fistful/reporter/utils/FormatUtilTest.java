@@ -14,5 +14,4 @@ public class FormatUtilTest {
         assertEquals(100.0, FormatUtils.formatCurrency(100, "JPY"), 0.0);
         assertEquals(0.01, FormatUtils.formatCurrency(100, "CLF"), 0.0);
     }
-
 }

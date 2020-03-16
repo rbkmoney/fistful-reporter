@@ -1,5 +1,6 @@
 package com.rbkmoney.fistful.reporter.dao;
 
+import com.rbkmoney.fistful.reporter.config.AbstractDaoConfig;
 import com.rbkmoney.fistful.reporter.domain.enums.FistfulCashFlowChangeType;
 import com.rbkmoney.fistful.reporter.domain.enums.ReportStatus;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.*;
@@ -16,7 +17,7 @@ import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class DaoTests extends AbstractAppDaoTests {
+public class DaoTests extends AbstractDaoConfig {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

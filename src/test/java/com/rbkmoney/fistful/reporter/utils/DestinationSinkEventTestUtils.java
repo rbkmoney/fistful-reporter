@@ -1,6 +1,5 @@
 package com.rbkmoney.fistful.reporter.utils;
 
-import com.rbkmoney.damsel.domain.Bank;
 import com.rbkmoney.easyway.AbstractTestUtils;
 import com.rbkmoney.fistful.account.Account;
 import com.rbkmoney.fistful.base.BankCard;
