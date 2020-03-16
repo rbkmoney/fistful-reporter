@@ -2,6 +2,7 @@ package com.rbkmoney.fistful.reporter.poller.impl;
 
 import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.base.BankCard;
+import com.rbkmoney.fistful.base.CryptoWallet;
 import com.rbkmoney.fistful.destination.Change;
 import com.rbkmoney.fistful.destination.Resource;
 import com.rbkmoney.fistful.destination.SinkEvent;
@@ -55,8 +56,9 @@ public class DestinationCreatedHandler implements DestinationEventHandler {
                     destination.setResourceBankCardPaymentSystem(bankCard.getPaymentSystem().toString());
                 }
             } else if (resource.isSetCryptoWallet()) {
-                destination.setCryptoWalletId(resource.getCryptoWallet().getId());
-                destination.setCryptoWalletCurrency(resource.getCryptoWallet().getCurrency().name());
+                CryptoWallet cryptoWallet = resource.getCryptoWallet();
+                destination.setCryptoWalletId(cryptoWallet.getId());
+                destination.setCryptoWalletCurrency(cryptoWallet.getData().getSetField().getFieldName());
             }
             destination.setResourceType(TBaseUtil.unionFieldToEnum(resource, DestinationResourceType.class));
 
