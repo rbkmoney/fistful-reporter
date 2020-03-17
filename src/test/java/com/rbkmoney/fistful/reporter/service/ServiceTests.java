@@ -33,6 +33,9 @@ public class ServiceTests extends AbstractServiceConfig {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private FileInfoService fileInfoService;
+
     @MockBean
     private PartyManagementSrv.Iface partyManagementClient;
 
@@ -47,6 +50,22 @@ public class ServiceTests extends AbstractServiceConfig {
 
     @Autowired
     private WithdrawalService withdrawalService;
+
+    @Test
+    public void fileInfoServiceTest() {
+        long reportId = reportService.createReport(
+                partyId,
+                contractId,
+                getFromTime().toInstant(ZoneOffset.UTC),
+                getToTime().toInstant(ZoneOffset.UTC),
+                "withdrawalRegistry"
+        );
+
+        range(0, 4).forEach(i -> fileInfoService.save(reportId, String.valueOf(i)));
+
+        assertEquals(4, fileInfoService.getFileDataIds(reportId).size());
+        assertEquals(0, fileInfoService.getFileDataIds(reportId + 1).size());
+    }
 
     @Test
     public void partyManagementServiceTest() throws TException {
