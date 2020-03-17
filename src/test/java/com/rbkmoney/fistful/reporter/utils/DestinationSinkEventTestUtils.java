@@ -2,10 +2,8 @@ package com.rbkmoney.fistful.reporter.utils;
 
 import com.rbkmoney.easyway.AbstractTestUtils;
 import com.rbkmoney.fistful.account.Account;
-import com.rbkmoney.fistful.base.CryptoCurrency;
-import com.rbkmoney.fistful.base.CryptoData;
-import com.rbkmoney.fistful.base.CryptoDataBitcoin;
-import com.rbkmoney.fistful.base.CryptoWallet;
+import com.rbkmoney.fistful.base.*;
+import com.rbkmoney.fistful.destination.Resource;
 import com.rbkmoney.fistful.destination.*;
 
 import java.util.List;
@@ -18,7 +16,8 @@ public class DestinationSinkEventTestUtils extends AbstractTestUtils {
 
     public static SinkEvent create(String destinationId, String identityId) {
         List<Change> changes = asList(
-                createCreatedChange(),
+                createCreatedChangeBankCard(),
+                createCreatedChangeCryptoWallet(),
                 createStatusChangedChange(),
                 createAccountCreatedChange(identityId)
         );
@@ -43,7 +42,17 @@ public class DestinationSinkEventTestUtils extends AbstractTestUtils {
         return Change.status(StatusChange.changed(Status.authorized(new Authorized())));
     }
 
-    private static Change createCreatedChange() {
+    private static Change createCreatedChangeBankCard() {
+        BankCard bankCard = random(BankCard.class, BankCard._Fields.BIN_DATA_ID.getFieldName());
+        return Change.created(
+                new com.rbkmoney.fistful.destination.Destination(
+                        generateString(),
+                        Resource.bank_card(bankCard)
+                )
+        );
+    }
+
+    private static Change createCreatedChangeCryptoWallet() {
         CryptoWallet cryptoWallet = new CryptoWallet();
         cryptoWallet.setId(UUID.randomUUID().toString());
         cryptoWallet.setCurrency(CryptoCurrency.bitcoin);

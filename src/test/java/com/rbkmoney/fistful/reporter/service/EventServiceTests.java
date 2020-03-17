@@ -78,7 +78,7 @@ public class EventServiceTests extends AbstractEventServiceConfig {
 
         destinationEventService.processSinkEvent(DestinationSinkEventTestUtils.create(destinationId, identityId));
 
-        verify(destinationDao, times(3)).save(any());
+        verify(destinationDao, times(4)).save(any());
     }
 
     @Test
