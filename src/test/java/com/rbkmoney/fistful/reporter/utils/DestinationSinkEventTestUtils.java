@@ -3,7 +3,6 @@ package com.rbkmoney.fistful.reporter.utils;
 import com.rbkmoney.easyway.AbstractTestUtils;
 import com.rbkmoney.fistful.account.Account;
 import com.rbkmoney.fistful.base.*;
-import com.rbkmoney.fistful.destination.Resource;
 import com.rbkmoney.fistful.destination.*;
 
 import java.util.List;
@@ -47,7 +46,7 @@ public class DestinationSinkEventTestUtils extends AbstractTestUtils {
         return Change.created(
                 new com.rbkmoney.fistful.destination.Destination(
                         generateString(),
-                        Resource.bank_card(bankCard)
+                        Resource.bank_card(new ResourceBankCard(bankCard))
                 )
         );
     }
@@ -60,7 +59,7 @@ public class DestinationSinkEventTestUtils extends AbstractTestUtils {
         return Change.created(
                 new com.rbkmoney.fistful.destination.Destination(
                         generateString(),
-                        Resource.crypto_wallet(cryptoWallet)
+                        Resource.crypto_wallet(new ResourceCryptoWallet(cryptoWallet))
                 )
         );
     }

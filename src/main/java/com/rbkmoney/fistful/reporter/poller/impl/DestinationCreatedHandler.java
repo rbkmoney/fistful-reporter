@@ -2,8 +2,9 @@ package com.rbkmoney.fistful.reporter.poller.impl;
 
 import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.base.BankCard;
+import com.rbkmoney.fistful.base.CryptoWallet;
+import com.rbkmoney.fistful.base.Resource;
 import com.rbkmoney.fistful.destination.Change;
-import com.rbkmoney.fistful.destination.Resource;
 import com.rbkmoney.fistful.destination.SinkEvent;
 import com.rbkmoney.fistful.reporter.dao.DestinationDao;
 import com.rbkmoney.fistful.reporter.domain.enums.DestinationEventType;
@@ -47,7 +48,7 @@ public class DestinationCreatedHandler implements DestinationEventHandler {
 
             Resource resource = change.getCreated().getResource();
             if (resource.isSetBankCard()) {
-                BankCard bankCard = resource.getBankCard();
+                BankCard bankCard = resource.getBankCard().getBankCard();
                 destination.setResourceBankCardToken(bankCard.getToken());
                 destination.setResourceBankCardBin(bankCard.getBin());
                 destination.setResourceBankCardMaskedPan(bankCard.getMaskedPan());
@@ -55,8 +56,9 @@ public class DestinationCreatedHandler implements DestinationEventHandler {
                     destination.setResourceBankCardPaymentSystem(bankCard.getPaymentSystem().toString());
                 }
             } else if (resource.isSetCryptoWallet()) {
-                destination.setCryptoWalletId(resource.getCryptoWallet().getId());
-                destination.setCryptoWalletCurrency(resource.getCryptoWallet().getData().getSetField().getFieldName());
+                CryptoWallet cryptoWallet = resource.getCryptoWallet().getCryptoWallet();
+                destination.setCryptoWalletId(cryptoWallet.getId());
+                destination.setCryptoWalletCurrency(cryptoWallet.getData().getSetField().getFieldName());
             }
             destination.setResourceType(TBaseUtil.unionFieldToEnum(resource, DestinationResourceType.class));
 
