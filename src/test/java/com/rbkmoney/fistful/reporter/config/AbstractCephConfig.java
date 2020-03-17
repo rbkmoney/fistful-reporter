@@ -2,11 +2,13 @@ package com.rbkmoney.fistful.reporter.config;
 
 import com.rbkmoney.easyway.*;
 import com.rbkmoney.fistful.reporter.config.properties.FileStorageProperties;
+import com.rbkmoney.fistful.reporter.config.properties.PartyManagementProperties;
 import com.rbkmoney.fistful.reporter.service.impl.FileStorageServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -23,12 +25,12 @@ import java.util.function.Supplier;
 @ContextConfiguration(
         classes = {
                 ClientConfig.class,
-                FileStorageProperties.class,
                 FileStorageServiceImpl.class,
         },
         initializers = AbstractCephConfig.Initializer.class
 )
 @TestPropertySource("classpath:application.yml")
+@EnableConfigurationProperties(value = {FileStorageProperties.class, PartyManagementProperties.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Slf4j
 public abstract class AbstractCephConfig extends AbstractTestUtils {
