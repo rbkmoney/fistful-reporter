@@ -56,7 +56,7 @@ public class DestinationCreatedHandler implements DestinationEventHandler {
                 }
             } else if (resource.isSetCryptoWallet()) {
                 destination.setCryptoWalletId(resource.getCryptoWallet().getId());
-                destination.setCryptoWalletCurrency(resource.getCryptoWallet().getCurrency().name());
+                destination.setCryptoWalletCurrency(resource.getCryptoWallet().getData().getSetField().getFieldName());
             }
             destination.setResourceType(TBaseUtil.unionFieldToEnum(resource, DestinationResourceType.class));
 

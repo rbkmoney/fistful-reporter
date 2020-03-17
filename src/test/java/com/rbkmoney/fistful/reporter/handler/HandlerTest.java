@@ -7,19 +7,16 @@ import com.rbkmoney.fistful.reporter.generator.ReportGenerator;
 import com.rbkmoney.fistful.reporter.service.FileStorageService;
 import com.rbkmoney.fistful.reporter.service.PartyManagementService;
 import com.rbkmoney.fistful.reporter.service.ReportService;
-import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
 import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
+import java.util.UUID;
 
 import static com.rbkmoney.geck.common.util.TypeUtil.temporalToString;
 import static org.junit.Assert.assertEquals;
@@ -29,16 +26,11 @@ import static org.mockito.Mockito.*;
 
 public class HandlerTest extends AbstractHandlerConfig {
 
-    private static final int TIMEOUT = 555000;
-
     @MockBean
     private PartyManagementService partyManagementService;
 
     @MockBean
     private FileStorageService fileStorageService;
-
-    @Value("${local.server.port}")
-    protected int port;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -49,19 +41,14 @@ public class HandlerTest extends AbstractHandlerConfig {
     @Autowired
     private ReportGenerator reportGenerator;
 
-    private ReportingSrv.Iface reportClient;
-
-    private ReportTimeRange reportTimeRange;
+    @Autowired
+    private ReportingSrv.Iface reportHandler;
 
     private ReportRequest request;
 
     @Before
-    public void setUp() throws URISyntaxException {
-        reportClient = new THSpawnClientBuilder()
-                .withAddress(new URI("http://localhost:" + port + "/fistful/reports"))
-                .withNetworkTimeout(TIMEOUT)
-                .build(ReportingSrv.Iface.class);
-        reportTimeRange = new ReportTimeRange(
+    public void setUp() {
+        ReportTimeRange reportTimeRange = new ReportTimeRange(
                 temporalToString(getFromTime()),
                 temporalToString(getToTime())
         );
@@ -70,7 +57,7 @@ public class HandlerTest extends AbstractHandlerConfig {
 
     @Test(expected = InvalidRequest.class)
     public void exceptionArgTest() throws TException {
-        reportClient.generateReport(request, "kek");
+        reportHandler.generateReport(request, "kek");
     }
 
     @Test
@@ -78,14 +65,15 @@ public class HandlerTest extends AbstractHandlerConfig {
         jdbcTemplate.execute("truncate table fr.report cascade");
 
         when(partyManagementService.getContract(anyString(), anyString())).thenReturn(new Contract());
+        when(fileStorageService.saveFile(any())).thenReturn(UUID.randomUUID().toString());
 
         saveWithdrawalsDependencies();
 
-        long reportId = reportClient.generateReport(request, "withdrawalRegistry");
+        long reportId = reportHandler.generateReport(request, "withdrawalRegistry");
 
         schedulerEmulation();
 
-        Report report = reportClient.getReport(partyId, contractId, reportId);
+        Report report = reportHandler.getReport(partyId, contractId, reportId);
 
         assertEquals(ReportStatus.created, report.getStatus());
         assertEquals(1, report.getFileDataIds().size());
