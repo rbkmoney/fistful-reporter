@@ -34,7 +34,7 @@ public class WithdrawalSinkEventTestUtils extends AbstractTestUtils {
     }
 
     private static Change createCreatedChange(String withdrawalId, String walletId) {
-        Withdrawal withdrawal = random(Withdrawal.class, "context", "status");
+        Withdrawal withdrawal = random(Withdrawal.class, "context", "status", "metadata", "quote");
         withdrawal.setId(withdrawalId);
         withdrawal.setWalletId(walletId);
         return Change.created(new CreatedChange(withdrawal));
