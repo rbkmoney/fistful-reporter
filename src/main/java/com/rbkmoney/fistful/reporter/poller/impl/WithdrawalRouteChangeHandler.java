@@ -47,7 +47,6 @@ public class WithdrawalRouteChangeHandler implements WithdrawalEventHandler {
             withdrawal.setSequenceId(event.getPayload().getSequence());
             withdrawal.setEventOccuredAt(TypeUtil.stringToLocalDateTime(event.getPayload().getOccuredAt()));
             withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_ROUTE_CHANGED);
-            withdrawal.setProviderId(providerId);
 
             withdrawalDao.updateNotCurrent(event.getSource());
             long id = withdrawalDao.save(withdrawal);
