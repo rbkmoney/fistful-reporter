@@ -34,9 +34,8 @@ public class TrasnferTestUtil extends AbstractTestUtils {
         return new Change(
                 Change.created(
                         new CreatedChange(
-                                new Transfer(
-                                        getFinalCashFlow()
-                                )
+                                new Transfer()
+                                .setCashflow(getFinalCashFlow())
                         )
                 )
         );
