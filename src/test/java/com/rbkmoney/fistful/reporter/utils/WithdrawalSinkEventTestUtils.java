@@ -55,6 +55,6 @@ public class WithdrawalSinkEventTestUtils extends AbstractTestUtils {
     }
 
     private static Change createRouteChangedChange() {
-        return Change.route(new RouteChange(new Route(generateString())));
+        return Change.route(new RouteChange(new Route(generateInt())));
     }
 }

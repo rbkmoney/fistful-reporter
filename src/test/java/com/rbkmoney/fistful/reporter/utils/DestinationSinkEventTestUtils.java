@@ -21,7 +21,7 @@ public class DestinationSinkEventTestUtils extends AbstractTestUtils {
                 createAccountCreatedChange(identityId)
         );
 
-        Event event = new Event(generateInt(), generateDate(), changes);
+        EventSinkPayload event = new EventSinkPayload(generateInt(), generateDate(), changes);
 
         return new SinkEvent(
                 generateLong(),
