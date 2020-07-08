@@ -34,7 +34,6 @@ public class WithdrawalRouteChangeHandler implements WithdrawalEventHandler {
     @Override
     public void handle(Change change, SinkEvent event) {
         try {
-            String providerId = change.getRoute().getRoute().getProviderId();
 
             log.info("Start withdrawal provider id changed handling, eventId={}, walletId={}, providerId={}", event.getId(), event.getSource(), providerId);
             Withdrawal withdrawal = withdrawalDao.get(event.getSource());
