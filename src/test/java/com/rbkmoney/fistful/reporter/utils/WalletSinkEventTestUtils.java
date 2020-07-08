@@ -28,7 +28,7 @@ public class WalletSinkEventTestUtils extends AbstractTestUtils {
     }
 
     private static Change createCreatedChange() {
-        return Change.created(random(Wallet.class, "context", "account"));
+        return Change.created(random(Wallet.class, "context", "account", "metadata"));
     }
 
     private static Change createAccountCreatedChange(String identityId) {

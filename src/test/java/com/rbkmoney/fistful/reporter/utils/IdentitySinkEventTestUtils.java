@@ -32,7 +32,7 @@ public class IdentitySinkEventTestUtils extends AbstractTestUtils {
     }
 
     private static Change createCreatedChange() {
-        return Change.created(random(Identity.class, "context"));
+        return Change.created(random(Identity.class, "context", "metadata"));
     }
 
     private static Change createLevelChangedChange() {

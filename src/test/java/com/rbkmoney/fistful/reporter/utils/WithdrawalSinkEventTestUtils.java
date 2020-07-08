@@ -7,8 +7,8 @@ import com.rbkmoney.fistful.withdrawal.status.Status;
 
 import java.util.List;
 
-import static com.rbkmoney.fistful.reporter.utils.TrasnferTestUtil.getCancelledPayload;
-import static com.rbkmoney.fistful.reporter.utils.TrasnferTestUtil.getCashFlowPayload;
+import static com.rbkmoney.fistful.reporter.utils.TransferTestUtil.getCancelledPayload;
+import static com.rbkmoney.fistful.reporter.utils.TransferTestUtil.getCashFlowPayload;
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static java.util.Arrays.asList;
 

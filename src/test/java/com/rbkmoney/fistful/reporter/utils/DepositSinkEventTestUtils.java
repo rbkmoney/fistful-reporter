@@ -7,8 +7,8 @@ import com.rbkmoney.fistful.deposit.status.Succeeded;
 
 import java.util.List;
 
-import static com.rbkmoney.fistful.reporter.utils.TrasnferTestUtil.getCashFlowPayload;
-import static com.rbkmoney.fistful.reporter.utils.TrasnferTestUtil.getCommitedPayload;
+import static com.rbkmoney.fistful.reporter.utils.TransferTestUtil.getCashFlowPayload;
+import static com.rbkmoney.fistful.reporter.utils.TransferTestUtil.getCommitedPayload;
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static java.util.Arrays.asList;
 
@@ -32,7 +32,7 @@ public class DepositSinkEventTestUtils extends AbstractTestUtils {
     }
 
     private static Change createCreatedChange(String walletId) {
-        Deposit deposit = random(Deposit.class, "status");
+        Deposit deposit = random(Deposit.class, "status", "metadata");
         deposit.setWalletId(walletId);
         return Change.created(new CreatedChange(deposit));
     }
