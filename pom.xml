@@ -19,8 +19,8 @@
     <properties>
         <postgresql.version>42.2.5</postgresql.version>
         <lombok.version>1.18.4</lombok.version>
-        <jxls.version>2.4.0</jxls.version>
-        <jxls.poi.version>1.0.14</jxls.poi.version>
+        <jxls.version>2.8.1</jxls.version>
+        <jxls.poi.version>2.8.1</jxls.poi.version>
         <hikari.version>3.1.0</hikari.version>
         <!---->
         <server.port>8022</server.port>
