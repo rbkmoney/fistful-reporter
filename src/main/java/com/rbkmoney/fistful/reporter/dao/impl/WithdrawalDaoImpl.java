@@ -85,6 +85,7 @@ public class WithdrawalDaoImpl extends AbstractGenericDao implements WithdrawalD
                                 .and(WITHDRAWAL.EVENT_CREATED_AT.ge(fromTime))
                                 .and(WITHDRAWAL.EVENT_CREATED_AT.le(toTime))
                                 .and(WITHDRAWAL.ID.gt(fromId))
+                                .and(WITHDRAWAL.CURRENT)
                 )
                 .orderBy(WITHDRAWAL.ID)
                 .limit(limit);

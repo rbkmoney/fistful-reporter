@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static io.github.benas.randombeans.api.EnhancedRandom.randomListOf;
 
 public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
@@ -98,20 +99,17 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
     private List<Withdrawal> createWithdrawals(String identityId, String partyId, String contractId, String walletId, LocalDateTime eventCreatedAtTime) {
         List<Withdrawal> withdrawals = new ArrayList<>();
         for (Withdrawal withdrawal : randomListOf(getExpectedSize(), Withdrawal.class)) {
-            withdrawal.setId(null);
-            withdrawal.setWalletId(walletId);
-            withdrawal.setWithdrawalStatus(WithdrawalStatus.succeeded);
-            withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_STATUS_CHANGED);
-            withdrawal.setEventCreatedAt(eventCreatedAtTime);
-            withdrawal.setPartyId(partyId);
-            withdrawal.setPartyContractId(contractId);
-            withdrawal.setIdentityId(identityId);
-            withdrawal.setCurrencyCode("RUB");
+            fillAsReportWithdrawal(identityId, partyId, contractId, walletId, eventCreatedAtTime, withdrawal);
             withdrawals.add(withdrawal);
         }
+        Withdrawal filtered = random(Withdrawal.class);
+        fillAsReportWithdrawal(identityId, partyId, contractId, walletId, eventCreatedAtTime, filtered);
+        filtered.setCurrent(false);
+//        withdrawals.add(filtered);
         for (Withdrawal withdrawal : randomListOf(4, Withdrawal.class)) {
             withdrawal.setId(null);
             withdrawals.add(withdrawal);
+            withdrawal.setCurrent(true);
         }
         for (Withdrawal withdrawal : randomListOf(4, Withdrawal.class)) {
             withdrawal.setId(null);
@@ -124,6 +122,7 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
             withdrawal.setIdentityId(identityId);
             withdrawal.setCurrencyCode("RUB");
             withdrawals.add(withdrawal);
+            withdrawal.setCurrent(true);
         }
         for (Withdrawal withdrawal : randomListOf(4, Withdrawal.class)) {
             withdrawal.setId(null);
@@ -133,19 +132,26 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
             withdrawal.setEventCreatedAt(eventCreatedAtTime);
             withdrawal.setCurrencyCode("RUB");
             withdrawals.add(withdrawal);
+            withdrawal.setCurrent(true);
         }
+        //filtered by time
         for (Withdrawal withdrawal : randomListOf(4, Withdrawal.class)) {
-            withdrawal.setId(null);
-            withdrawal.setWalletId(walletId);
-            withdrawal.setWithdrawalStatus(WithdrawalStatus.succeeded);
-            withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_STATUS_CHANGED);
-            withdrawal.setEventCreatedAt(eventCreatedAtTime.minusDays(21));
-            withdrawal.setPartyId(partyId);
-            withdrawal.setPartyContractId(contractId);
-            withdrawal.setIdentityId(identityId);
-            withdrawal.setCurrencyCode("RUB");
+            fillAsReportWithdrawal(identityId, partyId, contractId, walletId, eventCreatedAtTime.minusDays(21), withdrawal);
             withdrawals.add(withdrawal);
         }
         return withdrawals;
+    }
+
+    private void fillAsReportWithdrawal(String identityId, String partyId, String contractId, String walletId, LocalDateTime eventCreatedAtTime, Withdrawal withdrawal) {
+        withdrawal.setId(null);
+        withdrawal.setWalletId(walletId);
+        withdrawal.setWithdrawalStatus(WithdrawalStatus.succeeded);
+        withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_STATUS_CHANGED);
+        withdrawal.setEventCreatedAt(eventCreatedAtTime);
+        withdrawal.setPartyId(partyId);
+        withdrawal.setPartyContractId(contractId);
+        withdrawal.setIdentityId(identityId);
+        withdrawal.setCurrencyCode("RUB");
+        withdrawal.setCurrent(true);
     }
 }
