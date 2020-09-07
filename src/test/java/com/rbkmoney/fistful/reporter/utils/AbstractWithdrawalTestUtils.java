@@ -105,7 +105,7 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
         Withdrawal filtered = random(Withdrawal.class);
         fillAsReportWithdrawal(identityId, partyId, contractId, walletId, eventCreatedAtTime, filtered);
         filtered.setCurrent(false);
-//        withdrawals.add(filtered);
+        withdrawals.add(filtered);
         for (Withdrawal withdrawal : randomListOf(4, Withdrawal.class)) {
             withdrawal.setId(null);
             withdrawals.add(withdrawal);
