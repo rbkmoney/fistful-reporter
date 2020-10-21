@@ -25,12 +25,12 @@
         <!---->
         <server.port>8022</server.port>
         <exposed.ports>${server.port}</exposed.ports>
-        <dockerfile.base.service.tag>c0d0900ec19c907d866f8360031a836049985110</dockerfile.base.service.tag>
+        <dockerfile.base.service.tag>57e26d8ee999d7b0b50248c22afc63e6f926d276</dockerfile.base.service.tag>
         <dockerfile.registry>${env.REGISTRY}</dockerfile.registry>
         <metrics.version>1.1.0</metrics.version>
         <shared.resources.version>0.3.6</shared.resources.version>
         <eventstock.version>1.2.6</eventstock.version>
-        <fistful-proto.version>1.96-c93609c</fistful-proto.version>
+        <fistful-proto.version>1.106-ebe76ef</fistful-proto.version>
         <fistful-reporter-proto.version>1.5-e5157be</fistful-reporter-proto.version>
         <file-storage-proto.version>1.24-a77c0c4</file-storage-proto.version>
         <damsel.version>1.315-78c1128</damsel.version>
