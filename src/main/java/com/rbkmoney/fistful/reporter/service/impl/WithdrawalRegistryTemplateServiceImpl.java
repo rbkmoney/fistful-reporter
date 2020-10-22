@@ -1,13 +1,16 @@
 package com.rbkmoney.fistful.reporter.service.impl;
 
+import com.rbkmoney.dao.DaoException;
+import com.rbkmoney.fistful.reporter.dao.WithdrawalDao;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Report;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Withdrawal;
 import com.rbkmoney.fistful.reporter.dto.ReportType;
+import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.service.TemplateService;
-import com.rbkmoney.fistful.reporter.service.WithdrawalService;
 import com.rbkmoney.fistful.reporter.util.FormatUtils;
 import com.rbkmoney.fistful.reporter.util.TimeUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
@@ -24,10 +27,12 @@ import java.util.concurrent.atomic.LongAdder;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
 
     private static final int CELLS_COUNT = 7;
-    private final WithdrawalService withdrawalService;
+    private static final int LIMIT = 1000;
+    private final WithdrawalDao withdrawalDao;
 
     @Override
     public String getTemplateType() {
@@ -52,18 +57,27 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
         LongAdder inc = new LongAdder();
 
         // keep 100 rows in memory, exceeding rows will be flushed to disk
-        SXSSFWorkbook wb = new SXSSFWorkbook(100);
-        Sheet sh = getSheet(wb);
-        Font font = getFont(wb);
-        CellStyle greyStyle = getCellStyle(wb);
+        try (SXSSFWorkbook wb = new SXSSFWorkbook(100)) {
+            Sheet sh = getSheet(wb);
+            Font font = getFont(wb);
+            CellStyle greyStyle = getCellStyle(wb);
 
-        // first row
-        createFirstRow(fromTime, toTime, inc, sh, font);
+            // first row
+            createFirstRow(fromTime, toTime, inc, sh, font);
 
-        // second row
-        createSecondRow(inc, sh, font, greyStyle);
+            // second row
+            createSecondRow(inc, sh, font, greyStyle);
 
-        List<Withdrawal> withdrawals = withdrawalService.getSucceededWithdrawalsByReport(report);
+            writeLimitRows(report, reportZoneId, inc, sh, 0);
+
+            wb.write(outputStream);
+            outputStream.close();
+            wb.dispose();
+        }
+    }
+
+    private void writeLimitRows(Report report, ZoneId reportZoneId, LongAdder inc, Sheet sh, long fromId) {
+        List<Withdrawal> withdrawals = getSucceededWithdrawalsByReport(report, fromId);
 
         withdrawals.forEach(
                 withdrawal -> {
@@ -79,9 +93,31 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
                 }
         );
 
-        wb.write(outputStream);
-        outputStream.close();
-        wb.dispose();
+        initNextWriting(report, reportZoneId, inc, sh, withdrawals);
+    }
+
+    private void initNextWriting(Report report, ZoneId reportZoneId, LongAdder inc, Sheet sh, List<Withdrawal> withdrawals) {
+        if (withdrawals.size() == LIMIT) {
+            writeLimitRows(report, reportZoneId, inc, sh, withdrawals.get(withdrawals.size() - 1).getId());
+        }
+    }
+
+    private List<Withdrawal> getSucceededWithdrawalsByReport(Report report, long fromId) {
+        try {
+            log.info("Trying to get succeeded withdrawals by report, " +
+                            "reportId={}, partyId={}, contractId={}, fromId={}",
+                    report.getId(), report.getPartyId(), report.getContractId(), fromId);
+
+            List<Withdrawal> withdrawals = withdrawalDao.getSucceededWithdrawalsByReport(report, fromId, LIMIT);
+
+            log.info("{} succeeded withdrawals by report have been found, " +
+                            "reportId={}, partyId={}, contractId={}, fromId={}",
+                    withdrawals.size(), report.getId(), report.getPartyId(), report.getContractId(), fromId);
+
+            return withdrawals;
+        } catch (DaoException ex) {
+            throw new StorageException("Failed to get succeeded withdrawals", ex);
+        }
     }
 
     private Sheet getSheet(SXSSFWorkbook wb) {
