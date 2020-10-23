@@ -22,6 +22,4 @@ public interface ReportService {
 
     List<Report> getPendingReports();
 
-    Report getFirstPendingReport();
-
 }

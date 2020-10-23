@@ -128,18 +128,6 @@ public class ReportServiceImpl implements ReportService {
         }
     }
 
-    @Override
-    public Report getFirstPendingReport() {
-        try {
-            log.info("Trying to get report with status, reportStatus=pending");
-            Report report = reportDao.getFirstPendingReport();
-            log.info("Report has been found, reportStatus=pending, reportId={}",  report.getId());
-            return report;
-        } catch (DaoException ex) {
-            throw new StorageException("Failed to get pending reports", ex);
-        }
-    }
-
     private long createReport(String partyId, String contractId, Instant fromTime, Instant toTime, String reportType, ZoneId timezone, Instant createdAt) {
         try {
             log.info(

@@ -14,7 +14,8 @@ import java.util.List;
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static io.github.benas.randombeans.api.EnhancedRandom.randomListOf;
 import static java.util.Collections.emptyList;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class DaoTests extends AbstractDaoConfig {
 
@@ -138,14 +139,6 @@ public class DaoTests extends AbstractDaoConfig {
         assertEquals(5, reportDao.getReportsByRange(partyId, contractId, getFromTime(), getToTime(), emptyList()).size());
 
         assertEquals(0, reportDao.getReportsByRange(partyId, contractId, getFromTime().plusMinutes(1), getToTime(), emptyList()).size());
-
-        assertNotNull(reportDao.getFirstPendingReport());
-
-        for (Report pendingReport : reportDao.getPendingReports()) {
-            reportDao.changeReportStatus(pendingReport.getId(), ReportStatus.created);
-        }
-
-        assertNull(reportDao.getFirstPendingReport());
     }
 
     @Test

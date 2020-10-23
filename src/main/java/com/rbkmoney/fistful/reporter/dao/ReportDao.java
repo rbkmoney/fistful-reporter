@@ -19,6 +19,4 @@ public interface ReportDao extends GenericDao {
 
     List<Report> getPendingReports();
 
-    Report getFirstPendingReport();
-
 }
