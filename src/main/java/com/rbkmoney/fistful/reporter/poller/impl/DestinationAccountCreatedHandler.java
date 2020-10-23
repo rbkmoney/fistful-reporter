@@ -58,7 +58,7 @@ public class DestinationAccountCreatedHandler implements DestinationEventHandler
 
             destinationDao.updateNotCurrent(event.getSource());
             destinationDao.save(destination);
-            log.info("Destination account have been saved, eventId={}, destinationId={}, identityId={}", event.getId(), event.getSource(), account.getIdentity());
+            log.info("Destination account has been saved, eventId={}, destinationId={}, identityId={}", event.getId(), event.getSource(), account.getIdentity());
         } catch (DaoException e) {
             throw new StorageException(e);
         }
@@ -67,7 +67,7 @@ public class DestinationAccountCreatedHandler implements DestinationEventHandler
     private Destination getDestination(SinkEvent event) {
         Destination destination = destinationDao.get(event.getSource());
         if (destination == null) {
-            throw new SinkEventNotFoundException(String.format("Destination not found, destinationId='%s'", event.getSource()));
+            throw new SinkEventNotFoundException(String.format("Destination not found, destinationId=%s", event.getSource()));
         }
         return destination;
     }
@@ -75,7 +75,7 @@ public class DestinationAccountCreatedHandler implements DestinationEventHandler
     private Identity getIdentity(SinkEvent event, Account account) {
         Identity identity = identityDao.get(account.getIdentity());
         if (identity == null) {
-            throw new SinkEventNotFoundException(String.format("Identity not found, destinationId='%s', identityId='%s'", event.getSource(), account.getIdentity()));
+            throw new SinkEventNotFoundException(String.format("Identity not found, destinationId=%s, identityId=%s", event.getSource(), account.getIdentity()));
         }
         return identity;
     }

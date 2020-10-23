@@ -57,7 +57,7 @@ public class WalletAccountCreatedHandler implements WalletEventHandler {
 
             walletDao.updateNotCurrent(event.getSource());
             walletDao.save(wallet);
-            log.info("Wallet account have been saved, eventId={}, walletId={}, identityId={}", event.getId(), event.getSource(), account.getIdentity());
+            log.info("Wallet account has been saved, eventId={}, walletId={}, identityId={}", event.getId(), event.getSource(), account.getIdentity());
         } catch (DaoException e) {
             throw new StorageException(e);
         }
@@ -66,7 +66,7 @@ public class WalletAccountCreatedHandler implements WalletEventHandler {
     private Identity getIdentity(SinkEvent event, Account account) {
         Identity identity = identityDao.get(account.getIdentity());
         if (identity == null) {
-            throw new SinkEventNotFoundException(String.format("Identity not found, walletId='%s', identityId='%s'", event.getSource(), account.getIdentity()));
+            throw new SinkEventNotFoundException(String.format("Identity not found, walletId=%s, identityId=%s", event.getSource(), account.getIdentity()));
         }
         return identity;
     }
@@ -74,7 +74,7 @@ public class WalletAccountCreatedHandler implements WalletEventHandler {
     private Wallet getWallet(SinkEvent event) {
         Wallet wallet = walletDao.get(event.getSource());
         if (wallet == null) {
-            throw new SinkEventNotFoundException(String.format("Wallet not found, walletId='%s'", event.getSource()));
+            throw new SinkEventNotFoundException(String.format("Wallet not found, walletId=%s", event.getSource()));
         }
         return wallet;
     }

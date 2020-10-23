@@ -55,7 +55,7 @@ public class WithdrawalRouteChangeHandler implements WithdrawalEventHandler {
             fillCashFlows(cashFlows, event, WithdrawalEventType.WITHDRAWAL_ROUTE_CHANGED, id);
 
             fistfulCashFlowDao.save(cashFlows);
-            log.info("Withdrawal provider id have been changed, eventId={}, walletId={}", event.getId(), event.getSource());
+            log.info("Withdrawal provider id has been changed, eventId={}, walletId={}", event.getId(), event.getSource());
         } catch (DaoException e) {
             throw new StorageException(e);
         }

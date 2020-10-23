@@ -40,9 +40,9 @@ public class IdentityChallengeStatusChangedHandler implements IdentityEventHandl
 
             log.info("Challenge status changed handling: update identity, eventId={}, identityId={}", event.getId(), event.getSource());
             updateIdentity(event);
-            log.info("Challenge status changed handling: identity have been updated, eventId={}, identityId={}", event.getId(), event.getSource());
+            log.info("Challenge status changed handling: identity has been updated, eventId={}, identityId={}", event.getId(), event.getSource());
 
-            log.info("Identity challenge status have been changed, eventId={}, identityId={}, challengeId={}, status={}", event.getId(), event.getSource(), challengeChange.getId(), status);
+            log.info("Identity challenge status has been changed, eventId={}, identityId={}, challengeId={}, status={}", event.getId(), event.getSource(), challengeChange.getId(), status);
         } catch (DaoException e) {
             throw new StorageException(e);
         }

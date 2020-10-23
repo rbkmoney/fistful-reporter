@@ -60,7 +60,7 @@ public class DepositTransferStatusChangedHandler implements DepositEventHandler 
             List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(deposit.getId(), FistfulCashFlowChangeType.deposit);
             fillCashFlows(cashFlows, event, DepositEventType.DEPOSIT_TRANSFER_STATUS_CHANGED, id);
             fistfulCashFlowDao.save(cashFlows);
-            log.info("Withdrawal deposit status have been changed, eventId={}, depositId={}, transferChange={}", event.getId(), event.getSource(), change.getTransfer());
+            log.info("Withdrawal deposit status has been changed, eventId={}, depositId={}, transferChange={}", event.getId(), event.getSource(), change.getTransfer());
         } catch (DaoException e) {
             throw new StorageException(e);
         }

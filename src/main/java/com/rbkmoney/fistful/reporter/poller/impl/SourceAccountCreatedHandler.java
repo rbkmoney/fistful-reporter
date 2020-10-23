@@ -57,7 +57,7 @@ public class SourceAccountCreatedHandler implements SourceEventHandler {
 
             sourceDao.updateNotCurrent(event.getSource());
             sourceDao.save(source);
-            log.info("Source account have been saved, eventId={}, sourceId={}, identityId={}", event.getId(), event.getSource(), account.getIdentity());
+            log.info("Source account has been saved, eventId={}, sourceId={}, identityId={}", event.getId(), event.getSource(), account.getIdentity());
         } catch (DaoException e) {
             throw new StorageException(e);
         }
@@ -66,7 +66,7 @@ public class SourceAccountCreatedHandler implements SourceEventHandler {
     private Source getSource(SinkEvent event) {
         Source source = sourceDao.get(event.getSource());
         if (source == null) {
-            throw new SinkEventNotFoundException(String.format("Source not found, sourceId='%s'", event.getSource()));
+            throw new SinkEventNotFoundException(String.format("Source not found, sourceId=%s", event.getSource()));
         }
         return source;
     }
@@ -74,7 +74,7 @@ public class SourceAccountCreatedHandler implements SourceEventHandler {
     private Identity getIdentity(SinkEvent event, Account account) {
         Identity identity = identityDao.get(account.getIdentity());
         if (identity == null) {
-            throw new SinkEventNotFoundException(String.format("Identity not found, sourceId='%s', identityId='%s'", event.getSource(), account.getIdentity()));
+            throw new SinkEventNotFoundException(String.format("Identity not found, sourceId=%s, identityId=%s", event.getSource(), account.getIdentity()));
         }
         return identity;
     }

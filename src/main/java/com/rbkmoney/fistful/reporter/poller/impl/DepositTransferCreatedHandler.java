@@ -77,7 +77,7 @@ public class DepositTransferCreatedHandler implements DepositEventHandler {
                     )
             );
             fistfulCashFlowDao.save(fistfulCashFlows);
-            log.info("Deposit transfer have been saved, eventId={}, depositId={}, transferChange={}", event.getId(), event.getSource(), change.getTransfer());
+            log.info("Deposit transfer has been saved, eventId={}, depositId={}, transferChange={}", event.getId(), event.getSource(), change.getTransfer());
         } catch (DaoException e) {
             throw new StorageException(e);
         }

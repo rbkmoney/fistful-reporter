@@ -72,8 +72,7 @@ public class WithdrawalDaoImpl extends AbstractGenericDao implements WithdrawalD
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED)
-    public List<Withdrawal> getSucceededWithdrawalsByReport(Report report, Long fromId, int limit) {
+    public List<Withdrawal> getSucceededWithdrawals(Report report, Long fromId, int limit) {
         String partyId = report.getPartyId();
         String contractId = report.getContractId();
         LocalDateTime fromTime = report.getFromTime();

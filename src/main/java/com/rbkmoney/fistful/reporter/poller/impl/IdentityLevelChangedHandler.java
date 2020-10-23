@@ -44,7 +44,7 @@ public class IdentityLevelChangedHandler implements IdentityEventHandler {
 
             identityDao.updateNotCurrent(event.getSource());
             identityDao.save(identity);
-            log.info("Identity level have been changed, eventId={}, identityId={}, level={}", event.getId(), event.getSource(), change.getLevelChanged());
+            log.info("Identity level has been changed, eventId={}, identityId={}, level={}", event.getId(), event.getSource(), change.getLevelChanged());
         } catch (DaoException e) {
             throw new StorageException(e);
         }

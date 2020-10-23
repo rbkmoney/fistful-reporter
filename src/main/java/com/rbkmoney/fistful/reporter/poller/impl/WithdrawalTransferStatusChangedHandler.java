@@ -61,7 +61,7 @@ public class WithdrawalTransferStatusChangedHandler implements WithdrawalEventHa
             List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(withdrawal.getId(), FistfulCashFlowChangeType.withdrawal);
             fillCashFlows(cashFlows, event, WithdrawalEventType.WITHDRAWAL_TRANSFER_STATUS_CHANGED, id);
             fistfulCashFlowDao.save(cashFlows);
-            log.info("Withdrawal transfer status have been changed, eventId={}, walletId={}, transferChange={}", event.getId(), event.getSource(), change.getTransfer());
+            log.info("Withdrawal transfer status has been changed, eventId={}, walletId={}, transferChange={}", event.getId(), event.getSource(), change.getTransfer());
         } catch (DaoException e) {
             throw new StorageException(e);
         }

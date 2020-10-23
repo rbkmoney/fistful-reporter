@@ -14,8 +14,7 @@ import java.util.List;
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static io.github.benas.randombeans.api.EnhancedRandom.randomListOf;
 import static java.util.Collections.emptyList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class DaoTests extends AbstractDaoConfig {
 
@@ -58,19 +57,6 @@ public class DaoTests extends AbstractDaoConfig {
     public void depositDaoTest() {
         Deposit deposit = random(Deposit.class);
         deposit.setCurrent(true);
-        Long id = depositDao.save(deposit);
-        deposit.setId(id);
-        assertEquals(deposit, depositDao.get(deposit.getDepositId()));
-        depositDao.updateNotCurrent(deposit.getDepositId());
-        assertNull(depositDao.get(deposit.getDepositId()));
-    }
-
-    public void depositDaoDuplicationTest() {
-        Deposit deposit = random(Deposit.class);
-        deposit.setCurrent(true);
-        depositDao.updateNotCurrent(deposit.getDepositId());
-        depositDao.save(deposit);
-        depositDao.updateNotCurrent(deposit.getDepositId());
         Long id = depositDao.save(deposit);
         deposit.setId(id);
         assertEquals(deposit, depositDao.get(deposit.getDepositId()));
@@ -152,6 +138,14 @@ public class DaoTests extends AbstractDaoConfig {
         assertEquals(5, reportDao.getReportsByRange(partyId, contractId, getFromTime(), getToTime(), emptyList()).size());
 
         assertEquals(0, reportDao.getReportsByRange(partyId, contractId, getFromTime().plusMinutes(1), getToTime(), emptyList()).size());
+
+        assertNotNull(reportDao.getFirstPendingReport());
+
+        for (Report pendingReport : reportDao.getPendingReports()) {
+            reportDao.changeReportStatus(pendingReport.getId(), ReportStatus.created);
+        }
+
+        assertNull(reportDao.getFirstPendingReport());
     }
 
     @Test
@@ -190,7 +184,7 @@ public class DaoTests extends AbstractDaoConfig {
     @Test
     public void takeSucceededWithdrawalsTest() {
         saveWithdrawalsDependencies();
-        List<Withdrawal> withdrawalsByReport = withdrawalDao.getSucceededWithdrawalsByReport(report, 0L, 1000);
+        List<Withdrawal> withdrawalsByReport = withdrawalDao.getSucceededWithdrawals(report, 0L, 1000);
         assertEquals(getExpectedSize(), withdrawalsByReport.size());
     }
 

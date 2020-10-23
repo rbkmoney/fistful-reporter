@@ -11,8 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -24,15 +22,15 @@ public class FistfulReportsScheduler {
 
     @Scheduled(fixedDelayString = "${reporting.pollingDelay:3000}")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void processPendingReports() {
+    public void processPendingReport() {
         if (reportingProperties.isPollingEnable()) {
             try {
-                List<Report> reports = reportService.getPendingReports();
-                for (Report report : reports) {
-                    reportGenerator.generateReportFile(report);
-                }
+                log.info("Start scheduled task for building report");
+                Report report = reportService.getFirstPendingReport();
+                reportGenerator.generateReportFile(report);
+                log.info("Finish scheduled task for building report");
             } catch (Throwable ex) {
-                log.warn("Error with FistfulReportsScheduler", ex);
+                log.warn("Error with scheduled task for building report", ex);
                 throw ex;
             }
         }

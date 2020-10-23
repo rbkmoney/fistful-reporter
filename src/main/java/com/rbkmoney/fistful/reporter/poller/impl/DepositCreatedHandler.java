@@ -62,7 +62,7 @@ public class DepositCreatedHandler implements DepositEventHandler {
 
             depositDao.updateNotCurrent(event.getSource());
             depositDao.save(deposit);
-            log.info("Deposit have been saved, eventId={}, depositId={}", event.getId(), event.getSource());
+            log.info("Deposit has been saved, eventId={}, depositId={}", event.getId(), event.getSource());
         } catch (DaoException e) {
             throw new StorageException(e);
         }

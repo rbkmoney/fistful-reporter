@@ -62,7 +62,7 @@ public class WithdrawalCreatedHandler implements WithdrawalEventHandler {
 
             withdrawalDao.updateNotCurrent(event.getSource());
             withdrawalDao.save(withdrawal);
-            log.info("Withdrawal have been saved, eventId={}, walletId={}", event.getId(), event.getSource());
+            log.info("Withdrawal has been saved, eventId={}, walletId={}", event.getId(), event.getSource());
         } catch (DaoException e) {
             throw new StorageException(e);
         }
@@ -71,7 +71,7 @@ public class WithdrawalCreatedHandler implements WithdrawalEventHandler {
     private Wallet getWallet(SinkEvent event, String walletId) {
         Wallet wallet = walletDao.get(walletId);
         if (wallet == null) {
-            throw new SinkEventNotFoundException(String.format("Wallet not found, destinationId='%s', walletId='%s'", event.getSource(), walletId));
+            throw new SinkEventNotFoundException(String.format("Wallet not found, destinationId=%s, walletId=%s", event.getSource(), walletId));
         }
         return wallet;
     }

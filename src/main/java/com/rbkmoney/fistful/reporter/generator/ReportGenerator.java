@@ -30,7 +30,7 @@ public class ReportGenerator {
     private final FileStorageService fileStorageService;
 
     public void generateReportFile(Report report) {
-        logInfo("Trying to build report, ", report);
+        logInfo("Start generate report", report);
 
         List<String> fileDataIds = new ArrayList<>();
 
@@ -43,10 +43,12 @@ public class ReportGenerator {
                 Path reportFile = Files.createTempFile(getReportName(templateService), ".xlsx");
 
                 try {
-                    logInfo("Fill report file, template type: " + templateService.getTemplateType() + "; report: ", report);
+                    logInfo("Fill report file, templateType=" + templateService.getTemplateType(), report);
+
                     templateService.processReportFileByTemplate(report, Files.newOutputStream(reportFile));
 
-                    logInfo("Upload report file , template type: " + templateService.getTemplateType() + "; report: ", report);
+                    logInfo("Upload report file, templateType=" + templateService.getTemplateType(), report);
+
                     String fileDataId = fileStorageService.saveFile(reportFile);
 
                     fileDataIds.add(fileDataId);
@@ -60,18 +62,18 @@ public class ReportGenerator {
 
         finishedReportTask(report, fileDataIds);
 
-        logInfo("Report has been successfully built, ", report);
+        logInfo("Finish generate report", report);
     }
 
     private void finishedReportTask(Report report, List<String> fileDataIds) {
-        String fileDataIdsLog = fileDataIds.stream()
-                .collect(Collectors.joining(", ", "[", "]"));
+        String ids = fileDataIds.stream().collect(Collectors.joining(", ", "[", "]"));
 
-        logInfo("Save report files information, fileDataIds: " + fileDataIdsLog + "; report: ", report);
+        logInfo("Save report fileInfo, fileDataIds=" + ids, report);
         fileInfoService.save(report.getId(), fileDataIds);
 
-        logInfo("Change report status on [created], ", report);
+        logInfo("Change report status on [created]", report);
         reportService.changeReportStatus(report, ReportStatus.created);
+        report.setStatus(ReportStatus.created);
     }
 
     private String getReportName(TemplateService templateService) {
@@ -86,14 +88,14 @@ public class ReportGenerator {
     private String getFormatMessage(String message, Report report) {
         return String.format(
                 message +
-                        "reportId='%s', " +
-                        "partyId='%s', " +
-                        "contractId='%s', " +
-                        "fromTime='%s', " +
-                        "toTime='%s', " +
-                        "createdAt='%s', " +
-                        "reportType='%s', " +
-                        "status='%s'"
+                        ", reportId=%s, " +
+                        "partyId=%s, " +
+                        "contractId=%s, " +
+                        "fromTime=%s, " +
+                        "toTime=%s, " +
+                        "createdAt=%s, " +
+                        "reportType=%s, " +
+                        "status=%s"
                 ,
                 report.getId(),
                 report.getPartyId(),

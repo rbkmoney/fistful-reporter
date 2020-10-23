@@ -44,7 +44,7 @@ public class IdentityEffectiveChallengeChangedHandler implements IdentityEventHa
 
             identityDao.updateNotCurrent(event.getSource());
             identityDao.save(identity);
-            log.info("Effective identity challenge have been changed, eventId={}, identityId={}, effectiveChallengeId={}", event.getId(), event.getSource(), change.getEffectiveChallengeChanged());
+            log.info("Effective identity challenge has been changed, eventId={}, identityId={}, effectiveChallengeId={}", event.getId(), event.getSource(), change.getEffectiveChallengeChanged());
         } catch (DaoException e) {
             throw new StorageException(e);
         }

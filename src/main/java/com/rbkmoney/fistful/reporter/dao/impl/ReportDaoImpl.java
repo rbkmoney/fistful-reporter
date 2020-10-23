@@ -79,4 +79,14 @@ public class ReportDaoImpl extends AbstractGenericDao implements ReportDao {
 
         return fetch(query, reportRowMapper);
     }
+
+    @Override
+    public Report getFirstPendingReport() {
+        Query query = getDslContext().selectFrom(REPORT)
+                .where(REPORT.STATUS.eq(ReportStatus.pending))
+                .limit(1)
+                .forUpdate();
+
+        return fetchOne(query, reportRowMapper);
+    }
 }

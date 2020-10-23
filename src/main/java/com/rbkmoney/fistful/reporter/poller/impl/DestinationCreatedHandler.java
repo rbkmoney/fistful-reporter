@@ -64,7 +64,7 @@ public class DestinationCreatedHandler implements DestinationEventHandler {
 
             destinationDao.updateNotCurrent(event.getSource());
             destinationDao.save(destination);
-            log.info("Destination have been saved, eventId={}, destinationId={}", event.getId(), event.getSource());
+            log.info("Destination has been saved, eventId={}, destinationId={}", event.getId(), event.getSource());
         } catch (DaoException e) {
             throw new StorageException(e);
         }

@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface WithdrawalDao extends FistfulDao<Withdrawal> {
 
-    List<Withdrawal> getSucceededWithdrawalsByReport(Report report, Long fromId, int limit);
+    List<Withdrawal> getSucceededWithdrawals(Report report, Long fromId, int limit);
 
 }

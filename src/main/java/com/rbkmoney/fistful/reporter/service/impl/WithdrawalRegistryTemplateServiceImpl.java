@@ -1,16 +1,13 @@
 package com.rbkmoney.fistful.reporter.service.impl;
 
-import com.rbkmoney.dao.DaoException;
-import com.rbkmoney.fistful.reporter.dao.WithdrawalDao;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Report;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Withdrawal;
 import com.rbkmoney.fistful.reporter.dto.ReportType;
-import com.rbkmoney.fistful.reporter.exception.StorageException;
 import com.rbkmoney.fistful.reporter.service.TemplateService;
+import com.rbkmoney.fistful.reporter.service.WithdrawalService;
 import com.rbkmoney.fistful.reporter.util.FormatUtils;
 import com.rbkmoney.fistful.reporter.util.TimeUtils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
@@ -25,14 +22,15 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
 
+import static com.rbkmoney.fistful.reporter.service.WithdrawalService.WITHDRAWAL_LIMIT;
+
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
 
     private static final int CELLS_COUNT = 7;
-    private static final int LIMIT = 1000;
-    private final WithdrawalDao withdrawalDao;
+
+    private final WithdrawalService withdrawalService;
 
     @Override
     public String getTemplateType() {
@@ -63,12 +61,22 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
             CellStyle greyStyle = getCellStyle(wb);
 
             // first row
-            createFirstRow(fromTime, toTime, inc, sh, font);
+            createFirstRow(sh, font, inc, fromTime, toTime);
 
             // second row
-            createSecondRow(inc, sh, font, greyStyle);
+            createSecondRow(sh, font, inc, greyStyle);
 
-            writeLimitRows(report, reportZoneId, inc, sh, 0);
+            List<Withdrawal> withdrawals = withdrawalService.getSucceededLimitWithdrawals(report, 0);
+
+            createWithdrawalsRows(sh, inc, reportZoneId, withdrawals);
+
+            while (withdrawals.size() == WITHDRAWAL_LIMIT) {
+                long lastWithdrawalId = withdrawals.get(withdrawals.size() - 1).getId();
+
+                withdrawals = withdrawalService.getSucceededLimitWithdrawals(report, lastWithdrawalId);
+
+                createWithdrawalsRows(sh, inc, reportZoneId, withdrawals);
+            }
 
             wb.write(outputStream);
             outputStream.close();
@@ -76,9 +84,7 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
         }
     }
 
-    private void writeLimitRows(Report report, ZoneId reportZoneId, LongAdder inc, Sheet sh, long fromId) {
-        List<Withdrawal> withdrawals = getSucceededWithdrawalsByReport(report, fromId);
-
+    private void createWithdrawalsRows(Sheet sh, LongAdder inc, ZoneId reportZoneId, List<Withdrawal> withdrawals) {
         withdrawals.forEach(
                 withdrawal -> {
                     Row row = sh.createRow(inc.intValue());
@@ -92,37 +98,6 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
                     inc.increment();
                 }
         );
-
-        initNextWriting(report, reportZoneId, inc, sh, withdrawals);
-    }
-
-    private void initNextWriting(Report report, ZoneId reportZoneId, LongAdder inc, Sheet sh, List<Withdrawal> withdrawals) {
-        int size = withdrawals.size();
-        if (size == LIMIT) {
-            Long fromId = withdrawals.get(size - 1).getId();
-
-            withdrawals.clear();
-
-            writeLimitRows(report, reportZoneId, inc, sh, fromId);
-        }
-    }
-
-    private List<Withdrawal> getSucceededWithdrawalsByReport(Report report, long fromId) {
-        try {
-            log.info("Trying to get succeeded withdrawals by report, " +
-                            "reportId={}, partyId={}, contractId={}, fromId={}",
-                    report.getId(), report.getPartyId(), report.getContractId(), fromId);
-
-            List<Withdrawal> withdrawals = withdrawalDao.getSucceededWithdrawalsByReport(report, fromId, LIMIT);
-
-            log.info("{} succeeded withdrawals by report have been found, " +
-                            "reportId={}, partyId={}, contractId={}, fromId={}",
-                    withdrawals.size(), report.getId(), report.getPartyId(), report.getContractId(), fromId);
-
-            return withdrawals;
-        } catch (DaoException ex) {
-            throw new StorageException("Failed to get succeeded withdrawals", ex);
-        }
     }
 
     private Sheet getSheet(SXSSFWorkbook wb) {
@@ -144,7 +119,7 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
         return greyStyle;
     }
 
-    private void createFirstRow(String fromTime, String toTime, LongAdder inc, Sheet sh, Font font) {
+    private void createFirstRow(Sheet sh, Font font, LongAdder inc, String fromTime, String toTime) {
         Row firstRow = sh.createRow(inc.intValue());
         configUIFirstRow(sh, firstRow);
 
@@ -170,7 +145,7 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
         firstRowFirstCell.setCellValue(String.format("Выводы за период с %s по %s", fromTime, toTime));
     }
 
-    private void createSecondRow(LongAdder inc, Sheet sh, Font font, CellStyle greyStyle) {
+    private void createSecondRow(Sheet sh, Font font, LongAdder inc, CellStyle greyStyle) {
         Row secondRow = sh.createRow(inc.intValue());
         configUISecondRowAllCells(font, greyStyle, secondRow);
         initDataSecondRowAllCell(secondRow);

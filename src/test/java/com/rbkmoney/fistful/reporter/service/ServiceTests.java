@@ -157,7 +157,7 @@ public class ServiceTests extends AbstractServiceConfig {
 
     @Override
     protected int getExpectedSize() {
-        return 2000;
+        return 4001;
     }
 
     private long createReport(String reportType) {

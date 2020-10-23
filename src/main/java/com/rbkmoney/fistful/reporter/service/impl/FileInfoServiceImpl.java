@@ -37,7 +37,7 @@ public class FileInfoServiceImpl implements FileInfoService {
     @Transactional(propagation = Propagation.REQUIRED)
     public Long save(long reportId, String fileDataId) {
         try {
-            log.info("Trying to save file information, reportId='{}', fileDataId='{}'", reportId, fileDataId);
+            log.info("Trying to save fileInfo, reportId={}, fileDataId={}", reportId, fileDataId);
 
             FileInfo fileInfo = new FileInfo();
             fileInfo.setReportId(reportId);
@@ -45,10 +45,10 @@ public class FileInfoServiceImpl implements FileInfoService {
 
             Long id = fileInfoDao.save(fileInfo);
 
-            log.info("File information have been saved, reportId='{}', fileDataId='{}'", reportId, fileDataId);
+            log.info("FileInfo has been saved, reportId={}, fileDataId={}", reportId, fileDataId);
             return id;
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to save file info in storage, reportId=%s, fileDataId=%s", reportId, fileDataId), ex);
+            throw new StorageException(String.format("Failed to save file info, reportId=%s, fileDataId=%s", reportId, fileDataId), ex);
         }
     }
 
@@ -56,17 +56,17 @@ public class FileInfoServiceImpl implements FileInfoService {
     @Transactional(propagation = Propagation.REQUIRED)
     public List<String> getFileDataIds(long reportId) {
         try {
-            log.info("Trying to get files information, reportId='{}'", reportId);
+            log.info("Trying to get fileInfo, reportId={}", reportId);
 
             List<String> fileIds = fileInfoDao.getByReportId(reportId).stream()
                     .map(FileInfo::getFileDataId)
                     .collect(Collectors.toList());
 
-            log.info("Files information for report have been found, reportId='{}'", reportId);
+            log.info("FileInfo for report has been found, reportId={}", reportId);
 
             return fileIds;
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to get file info in storage, reportId=%s", reportId), ex);
+            throw new StorageException(String.format("Failed to get fileInfo, reportId=%s", reportId), ex);
         }
     }
 }
