@@ -97,8 +97,13 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
     }
 
     private void initNextWriting(Report report, ZoneId reportZoneId, LongAdder inc, Sheet sh, List<Withdrawal> withdrawals) {
-        if (withdrawals.size() == LIMIT) {
-            writeLimitRows(report, reportZoneId, inc, sh, withdrawals.get(withdrawals.size() - 1).getId());
+        int size = withdrawals.size();
+        if (size == LIMIT) {
+            Long fromId = withdrawals.get(size - 1).getId();
+
+            withdrawals.clear();
+
+            writeLimitRows(report, reportZoneId, inc, sh, fromId);
         }
     }
 
