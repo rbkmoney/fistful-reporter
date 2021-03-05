@@ -1,19 +1,34 @@
 info:
   version: @project.version@
   stage: dev
+
 server:
   port: @server.port@
+
 management:
-  endpoint:
-    health:
-      show-details: always
+  security:
+    flag: false
+  server:
+    port: @management.port@
   metrics:
     export:
       statsd:
         flavor: etsy
         enabled: false
-  security:
-    flag: false
+      prometheus:
+        enabled: false
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
 spring:
   application:
     name: @project.name@
@@ -31,21 +46,26 @@ spring:
   output:
     ansi:
       enabled: always
+
 eventstock:
   pollingEnable: true
+
 partymanagement:
   url: http://hellgate:8022/v1/processing/partymgmt
   timeout: 5000
+
 filestorage:
   url: http://file-storage:8022/file_storage
   clientTimeout: 5000
   urlLifeTimeDuration: 360
   timeZone: Europe/Moscow
+
 reporting:
   reportsLimit: 0
   defaultTimeZone: Europe/Moscow
   pollingEnable: true
   pollingDelay: 3000
+
 kafka:
   bootstrap-servers: changeit:9092
   consumer:
