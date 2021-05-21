@@ -40,6 +40,9 @@ public class WithdrawalStatusChangedHandler implements WithdrawalEventHandler {
                     event.getEventId(), event.getSourceId(), change.getChange().getStatusChanged());
 
             Withdrawal withdrawal = withdrawalDao.get(event.getSourceId());
+
+            Long oldId = withdrawal.getId();
+
             withdrawal.setId(null);
             withdrawal.setWtime(null);
             withdrawal.setEventId(event.getEventId());
@@ -47,10 +50,10 @@ public class WithdrawalStatusChangedHandler implements WithdrawalEventHandler {
             withdrawal.setWithdrawalId(event.getSourceId());
             withdrawal.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
             withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_STATUS_CHANGED);
+
             Status status = change.getChange().getStatusChanged().getStatus();
             withdrawal.setWithdrawalStatus(TBaseUtil.unionFieldToEnum(status, WithdrawalStatus.class));
 
-            Long oldId = withdrawal.getId();
             withdrawalDao.save(withdrawal).ifPresentOrElse(
                     id -> {
                         withdrawalDao.updateNotCurrent(oldId);

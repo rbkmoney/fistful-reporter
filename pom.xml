@@ -30,6 +30,7 @@
         <file-storage-proto.version>1.24-a77c0c4</file-storage-proto.version>
         <machinegun-proto.version>1.18-d814d69</machinegun-proto.version>
         <sink-common-lib.version>0.0.7</sink-common-lib.version>
+        <checkstyle.config.suppressions.path>./src/main/resources/checkstyle/checkstyle-suppressions.xml</checkstyle.config.suppressions.path>
         <!---->
         <db.name>fistful_reporter</db.name>
         <db.schema>fr</db.schema>
@@ -42,7 +43,7 @@
         <db.embedded.schema>${db.schema}</db.embedded.schema>
         <db.embedded.user>${db.user}</db.embedded.user>
         <db.embedded.password>${db.password}</db.embedded.password>
-        <db.embedded.port>15432</db.embedded.port>
+        <db.embedded.port>5432</db.embedded.port>
         <db.embedded.url>jdbc:postgresql://localhost:${db.embedded.port}/${db.embedded.name}</db.embedded.url>
     </properties>
 

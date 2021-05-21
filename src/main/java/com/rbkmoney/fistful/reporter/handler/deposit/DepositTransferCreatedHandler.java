@@ -46,6 +46,9 @@ public class DepositTransferCreatedHandler implements DepositEventHandler {
                     event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
 
             Deposit deposit = depositDao.get(event.getSourceId());
+
+            Long oldId = deposit.getId();
+
             deposit.setId(null);
             deposit.setWtime(null);
             deposit.setEventId(event.getEventId());
@@ -66,7 +69,6 @@ public class DepositTransferCreatedHandler implements DepositEventHandler {
             deposit.setFee(CashFlowConverter.getFistfulFee(postings));
             deposit.setProviderFee(CashFlowConverter.getFistfulProviderFee(postings));
 
-            Long oldId = deposit.getId();
             depositDao.save(deposit).ifPresentOrElse(
                     id -> {
                         depositDao.updateNotCurrent(oldId);

@@ -45,6 +45,9 @@ public class WithdrawalTransferCreatedHandler implements WithdrawalEventHandler 
             log.info("Start withdrawal transfer created handling, eventId={}, withdrawalId={}, transferChange={}",
                     event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
             Withdrawal withdrawal = withdrawalDao.get(event.getSourceId());
+
+            Long oldId = withdrawal.getId();
+
             withdrawal.setId(null);
             withdrawal.setWtime(null);
             withdrawal.setEventId(event.getEventId());
@@ -59,7 +62,6 @@ public class WithdrawalTransferCreatedHandler implements WithdrawalEventHandler 
             withdrawal.setFee(CashFlowConverter.getFistfulFee(postings));
             withdrawal.setProviderFee(CashFlowConverter.getFistfulProviderFee(postings));
 
-            Long oldId = withdrawal.getId();
             withdrawalDao.save(withdrawal).ifPresentOrElse(
                     id -> {
                         withdrawalDao.updateNotCurrent(oldId);

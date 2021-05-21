@@ -76,6 +76,9 @@ public class IdentityChallengeCreatedHandler implements IdentityEventHandler {
 
     private void updateIdentity(MachineEvent event, TimestampedChange change) {
         Identity identity = identityDao.get(event.getSourceId());
+
+        Long oldId = identity.getId();
+
         identity.setId(null);
         identity.setWtime(null);
         identity.setEventId(event.getEventId());
@@ -84,7 +87,6 @@ public class IdentityChallengeCreatedHandler implements IdentityEventHandler {
         identity.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
         identity.setEventType(IdentityEventType.IDENTITY_CHALLENGE_CREATED);
 
-        Long oldId = identity.getId();
         identityDao.save(identity).ifPresentOrElse(
                 id -> {
                     identityDao.updateNotCurrent(oldId);

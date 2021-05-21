@@ -45,6 +45,9 @@ public class DepositTransferStatusChangedHandler implements DepositEventHandler 
                     event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
 
             Deposit deposit = depositDao.get(event.getSourceId());
+
+            Long oldId = deposit.getId();
+
             deposit.setId(null);
             deposit.setWtime(null);
             deposit.setEventId(event.getEventId());
@@ -52,10 +55,10 @@ public class DepositTransferStatusChangedHandler implements DepositEventHandler 
             deposit.setDepositId(event.getSourceId());
             deposit.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
             deposit.setEventType(DepositEventType.DEPOSIT_TRANSFER_STATUS_CHANGED);
+
             Status status = change.getChange().getTransfer().getPayload().getStatusChanged().getStatus();
             deposit.setDepositTransferStatus(TBaseUtil.unionFieldToEnum(status, DepositTransferStatus.class));
 
-            Long oldId = deposit.getId();
             depositDao.save(deposit).ifPresentOrElse(
                     id -> {
                         depositDao.updateNotCurrent(oldId);

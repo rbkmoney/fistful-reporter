@@ -35,6 +35,9 @@ public class DestinationAccountCreatedHandler implements DestinationEventHandler
             log.info("Start destination account created handling, eventId={}, destinationId={}",
                     event.getEventId(), event.getSourceId());
             Destination destination = getDestination(event);
+
+            Long oldId = destination.getId();
+
             destination.setId(null);
             destination.setWtime(null);
             destination.setEventId(event.getEventId());
@@ -53,7 +56,6 @@ public class DestinationAccountCreatedHandler implements DestinationEventHandler
             destination.setPartyContractId(identity.getPartyContractId());
             destination.setIdentityId(identity.getIdentityId());
 
-            Long oldId = destination.getId();
             destinationDao.save(destination).ifPresentOrElse(
                     id -> {
                         destinationDao.updateNotCurrent(oldId);

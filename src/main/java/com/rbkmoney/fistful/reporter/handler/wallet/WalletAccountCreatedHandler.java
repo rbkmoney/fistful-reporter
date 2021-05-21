@@ -37,6 +37,9 @@ public class WalletAccountCreatedHandler implements WalletEventHandler {
                     event.getEventId(), event.getSourceId(), account.getIdentity());
 
             Wallet wallet = getWallet(event);
+
+            Long oldId = wallet.getId();
+
             wallet.setId(null);
             wallet.setWtime(null);
             wallet.setEventId(event.getEventId());
@@ -53,7 +56,6 @@ public class WalletAccountCreatedHandler implements WalletEventHandler {
             wallet.setPartyContractId(identity.getPartyContractId());
             wallet.setIdentityId(identity.getIdentityId());
 
-            Long oldId = wallet.getId();
             walletDao.save(wallet).ifPresentOrElse(
                     id -> {
                         walletDao.updateNotCurrent(oldId);

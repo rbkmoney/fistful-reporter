@@ -35,6 +35,9 @@ public class DestinationStatusChangedHandler implements DestinationEventHandler 
                     event.getEventId(), event.getSourceId(), status);
 
             Destination destination = destinationDao.get(event.getSourceId());
+
+            Long oldId = destination.getId();
+
             destination.setId(null);
             destination.setWtime(null);
             destination.setEventId(event.getEventId());
@@ -44,7 +47,6 @@ public class DestinationStatusChangedHandler implements DestinationEventHandler 
             destination.setEventType(DestinationEventType.DESTINATION_STATUS_CHANGED);
             destination.setDestinationStatus(TBaseUtil.unionFieldToEnum(status, DestinationStatus.class));
 
-            Long oldId = destination.getId();
             destinationDao.save(destination).ifPresentOrElse(
                     id -> {
                         destinationDao.updateNotCurrent(oldId);
