@@ -48,7 +48,9 @@ public class FileInfoServiceImpl implements FileInfoService {
             log.info("FileInfo has been saved, reportId={}, fileDataId={}", reportId, fileDataId);
             return id;
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to save file info, reportId=%s, fileDataId=%s", reportId, fileDataId), ex);
+            throw new StorageException(
+                    String.format("Failed to save file info, reportId=%s, fileDataId=%s", reportId, fileDataId),
+                    ex);
         }
     }
 

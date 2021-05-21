@@ -30,16 +30,19 @@ public class PartyManagementServiceImpl implements PartyManagementService {
             return party;
         } catch (PartyNotFound ex) {
             throw new PartyNotFoundException(
-                    String.format("Party not found, partyId='%s', partyRevisionParam='%s'", partyId, partyRevisionParam), ex
-            );
+                    String.format("Party not found, partyId='%s', partyRevisionParam='%s'",
+                            partyId, partyRevisionParam),
+                    ex);
         } catch (InvalidPartyRevision ex) {
             throw new PartyNotFoundException(
-                    String.format("Invalid party revision, partyId='%s', partyRevisionParam='%s'", partyId, partyRevisionParam), ex
-            );
+                    String.format("Invalid party revision, partyId='%s', partyRevisionParam='%s'",
+                            partyId, partyRevisionParam),
+                    ex);
         } catch (TException ex) {
             throw new PartyManagementClientException(
-                    String.format("Failed to get party, partyId='%s', partyRevisionParam='%s'", partyId, partyRevisionParam), ex
-            );
+                    String.format("Failed to get party, partyId='%s', partyRevisionParam='%s'",
+                            partyId, partyRevisionParam),
+                    ex);
         }
     }
 
@@ -53,9 +56,13 @@ public class PartyManagementServiceImpl implements PartyManagementService {
         } catch (PartyNotFound ex) {
             throw new PartyNotFoundException(String.format("Party not found, partyId='%s'", partyId), ex);
         } catch (ContractNotFound ex) {
-            throw new ContractNotFoundException(String.format("Contract not found, partyId='%s', contractId='%s'", partyId, contractId));
+            throw new ContractNotFoundException(
+                    String.format("Contract not found, partyId='%s', contractId='%s'", partyId, contractId));
         } catch (TException ex) {
-            throw new PartyManagementClientException(String.format("Failed to get contract, partyId='%s', contractId='%s'", partyId, contractId), ex);
+            throw new PartyManagementClientException(
+                    String.format("Failed to get contract, partyId='%s', contractId='%s'",
+                            partyId, contractId),
+                    ex);
         }
     }
 }

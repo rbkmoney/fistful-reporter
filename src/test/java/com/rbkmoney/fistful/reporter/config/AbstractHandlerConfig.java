@@ -27,13 +27,16 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@ContextConfiguration(classes = FistfulReporterApplication.class, initializers = AbstractHandlerConfig.Initializer.class)
+@ContextConfiguration(
+        classes = FistfulReporterApplication.class,
+        initializers = AbstractHandlerConfig.Initializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestPropertySource("classpath:application.yml")
 @Slf4j
 public abstract class AbstractHandlerConfig extends AbstractWithdrawalTestUtils {
 
-    private static TestContainers testContainers = TestContainersBuilder.builderWithTestContainers(getTestContainersParametersSupplier())
+    private static TestContainers testContainers = TestContainersBuilder
+            .builderWithTestContainers(getTestContainersParametersSupplier())
             .addPostgresqlTestContainer()
             .build();
 

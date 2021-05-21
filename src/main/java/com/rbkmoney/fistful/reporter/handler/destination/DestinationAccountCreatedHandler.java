@@ -32,39 +32,37 @@ public class DestinationAccountCreatedHandler implements DestinationEventHandler
     @Override
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
-            log.info("Start destination account created handling, eventId={}, destinationId={}", event.getEventId(), event.getSourceId());
-            Account account = change.getChange().getAccount().getCreated();
+            log.info("Start destination account created handling, eventId={}, destinationId={}",
+                    event.getEventId(), event.getSourceId());
             Destination destination = getDestination(event);
-            Long oldId = destination.getId();
-
-            Identity identity = getIdentity(event, account);
-
             destination.setId(null);
             destination.setWtime(null);
-
             destination.setEventId(event.getEventId());
             destination.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
             destination.setDestinationId(event.getSourceId());
             destination.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
             destination.setEventType(DestinationEventType.DESTINATION_ACCOUNT_CREATED);
+
+            Account account = change.getChange().getAccount().getCreated();
             destination.setAccountId(account.getId());
             destination.setCurrencyCode(account.getCurrency().getSymbolicCode());
             destination.setAccounterAccountId(account.getAccounterAccountId());
 
+            Identity identity = getIdentity(event, account);
             destination.setPartyId(identity.getPartyId());
             destination.setPartyContractId(identity.getPartyContractId());
             destination.setIdentityId(identity.getIdentityId());
 
-
+            Long oldId = destination.getId();
             destinationDao.save(destination).ifPresentOrElse(
                     id -> {
                         destinationDao.updateNotCurrent(oldId);
                         log.info("Destination account have been created, eventId={}, destinationId={}, identityId={}",
                                 event.getEventId(), event.getSourceId(), account.getIdentity());
                     },
-                    () -> log.info("Destination account create bound duplicated, eventId={}, destinationId={}, identityId={}",
-                            event.getEventId(), event.getSourceId(), account.getIdentity())
-            );
+                    () -> log.info("Destination account create bound duplicated, " +
+                                    "eventId={}, destinationId={}, identityId={}",
+                            event.getEventId(), event.getSourceId(), account.getIdentity()));
         } catch (DaoException e) {
             throw new StorageException(e);
         }
@@ -73,7 +71,8 @@ public class DestinationAccountCreatedHandler implements DestinationEventHandler
     private Destination getDestination(MachineEvent event) {
         Destination destination = destinationDao.get(event.getSourceId());
         if (destination == null) {
-            throw new SinkEventNotFoundException(String.format("Destination not found, destinationId='%s'", event.getSourceId()));
+            throw new SinkEventNotFoundException(
+                    String.format("Destination not found, destinationId='%s'", event.getSourceId()));
         }
         return destination;
     }
@@ -81,7 +80,9 @@ public class DestinationAccountCreatedHandler implements DestinationEventHandler
     private Identity getIdentity(MachineEvent event, Account account) {
         Identity identity = identityDao.get(account.getIdentity());
         if (identity == null) {
-            throw new SinkEventNotFoundException(String.format("Identity not found, destinationId='%s', identityId='%s'", event.getSourceId(), account.getIdentity()));
+            throw new SinkEventNotFoundException(
+                    String.format("Identity not found, destinationId='%s', identityId='%s'",
+                            event.getSourceId(), account.getIdentity()));
         }
         return identity;
     }

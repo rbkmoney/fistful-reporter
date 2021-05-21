@@ -38,14 +38,18 @@ public class ReportDaoImpl extends AbstractGenericDao implements ReportDao {
     }
 
     @Override
-    public List<Report> getReportsByRange(String partyId, String contractId, LocalDateTime fromTime, LocalDateTime toTime, List<String> reportTypes) {
+    public List<Report> getReportsByRange(
+            String partyId,
+            String contractId,
+            LocalDateTime fromTime,
+            LocalDateTime toTime,
+            List<String> reportTypes) {
         Condition condition = REPORT.PARTY_ID.eq(partyId)
                 .and(REPORT.CONTRACT_ID.eq(contractId))
                 .and(REPORT.FROM_TIME.ge(fromTime))
                 .and(REPORT.TO_TIME.le(toTime));
 
         if (!reportTypes.isEmpty()) {
-            // https://github.com/rbkmoney/fistful-reporter-proto/blob/e5157befc28943c9c60d22a8fb2f18c23bf1d48f/proto/fistful_reporter.thrift#L83
             condition = condition.and(REPORT.TYPE.in(reportTypes));
         }
 

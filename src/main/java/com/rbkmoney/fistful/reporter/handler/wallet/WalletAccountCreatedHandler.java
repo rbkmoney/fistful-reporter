@@ -33,14 +33,12 @@ public class WalletAccountCreatedHandler implements WalletEventHandler {
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
             Account account = change.getChange().getAccount().getCreated();
-            log.info("Start wallet account created handling, eventId={}, walletId={}, identityId={}", event.getEventId(), event.getSourceId(), account.getIdentity());
-            Wallet wallet = getWallet(event);
-            Identity identity = getIdentity(event, account);
-            Long oldId = wallet.getId();
+            log.info("Start wallet account created handling, eventId={}, walletId={}, identityId={}",
+                    event.getEventId(), event.getSourceId(), account.getIdentity());
 
+            Wallet wallet = getWallet(event);
             wallet.setId(null);
             wallet.setWtime(null);
-
             wallet.setEventId(event.getEventId());
             wallet.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
             wallet.setWalletId(event.getSourceId());
@@ -50,10 +48,12 @@ public class WalletAccountCreatedHandler implements WalletEventHandler {
             wallet.setAccounterAccountId(account.getAccounterAccountId());
             wallet.setCurrencyCode(account.getCurrency().getSymbolicCode());
 
+            Identity identity = getIdentity(event, account);
             wallet.setPartyId(identity.getPartyId());
             wallet.setPartyContractId(identity.getPartyContractId());
             wallet.setIdentityId(identity.getIdentityId());
 
+            Long oldId = wallet.getId();
             walletDao.save(wallet).ifPresentOrElse(
                     id -> {
                         walletDao.updateNotCurrent(oldId);
@@ -70,7 +70,9 @@ public class WalletAccountCreatedHandler implements WalletEventHandler {
     private Identity getIdentity(MachineEvent event, Account account) {
         Identity identity = identityDao.get(account.getIdentity());
         if (identity == null) {
-            throw new SinkEventNotFoundException(String.format("Identity not found, walletId='%s', identityId='%s'", event.getSourceId(), account.getIdentity()));
+            throw new SinkEventNotFoundException(
+                    String.format("Identity not found, walletId='%s', identityId='%s'",
+                            event.getSourceId(), account.getIdentity()));
         }
         return identity;
     }
@@ -78,7 +80,8 @@ public class WalletAccountCreatedHandler implements WalletEventHandler {
     private Wallet getWallet(MachineEvent event) {
         Wallet wallet = walletDao.get(event.getSourceId());
         if (wallet == null) {
-            throw new SinkEventNotFoundException(String.format("Wallet not found, walletId='%s'", event.getSourceId()));
+            throw new SinkEventNotFoundException(
+                    String.format("Wallet not found, walletId='%s'", event.getSourceId()));
         }
         return wallet;
     }

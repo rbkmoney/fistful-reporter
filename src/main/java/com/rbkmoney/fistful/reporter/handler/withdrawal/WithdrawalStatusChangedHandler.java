@@ -36,27 +36,27 @@ public class WithdrawalStatusChangedHandler implements WithdrawalEventHandler {
     @Override
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
-            Status status = change.getChange().getStatusChanged().getStatus();
-
-            log.info("Start withdrawal status changed handling, eventId={}, withdrawalId={}, status={}", event.getEventId(), event.getSourceId(), change.getChange().getStatusChanged());
+            log.info("Start withdrawal status changed handling, eventId={}, withdrawalId={}, status={}",
+                    event.getEventId(), event.getSourceId(), change.getChange().getStatusChanged());
 
             Withdrawal withdrawal = withdrawalDao.get(event.getSourceId());
-            Long oldId = withdrawal.getId();
-
             withdrawal.setId(null);
             withdrawal.setWtime(null);
-
             withdrawal.setEventId(event.getEventId());
             withdrawal.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
             withdrawal.setWithdrawalId(event.getSourceId());
             withdrawal.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
             withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_STATUS_CHANGED);
+            Status status = change.getChange().getStatusChanged().getStatus();
             withdrawal.setWithdrawalStatus(TBaseUtil.unionFieldToEnum(status, WithdrawalStatus.class));
 
+            Long oldId = withdrawal.getId();
             withdrawalDao.save(withdrawal).ifPresentOrElse(
                     id -> {
                         withdrawalDao.updateNotCurrent(oldId);
-                        List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(withdrawal.getId(), FistfulCashFlowChangeType.withdrawal);
+                        List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(
+                                withdrawal.getId(),
+                                FistfulCashFlowChangeType.withdrawal);
                         fillCashFlows(cashFlows, event, WithdrawalEventType.WITHDRAWAL_STATUS_CHANGED, id, change);
                         fistfulCashFlowDao.save(cashFlows);
                         log.info("Withdrawal status have been changed, eventId={}, withdrawalId={}, status={}",

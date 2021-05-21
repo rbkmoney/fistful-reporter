@@ -40,7 +40,7 @@ public class FistfulReportsHandler implements ReportingSrv.Iface {
             Instant toTime = TypeUtil.stringToInstant(reportRequest.getTimeRange().getToTime());
             Instant fromTime = TypeUtil.stringToInstant(reportRequest.getTimeRange().getFromTime());
 
-            List<com.rbkmoney.fistful.reporter.domain.tables.pojos.Report> reportsByRange = reportService.getReportsByRangeNotCancelled(
+            var reportsByRange = reportService.getReportsByRangeNotCancelled(
                     reportRequest.getPartyId(),
                     reportRequest.getContractId(),
                     fromTime,
@@ -48,7 +48,8 @@ public class FistfulReportsHandler implements ReportingSrv.Iface {
                     reportTypes
             );
 
-            if (reportingProperties.getReportsLimit() > 0 && reportsByRange.size() > reportingProperties.getReportsLimit()) {
+            if (reportingProperties.getReportsLimit() > 0
+                    && reportsByRange.size() > reportingProperties.getReportsLimit()) {
                 throw new LimitException(
                         String.format(
                                 "Reports size by storage more then limit by properties: storage=%s, properties=%s",
@@ -68,9 +69,9 @@ public class FistfulReportsHandler implements ReportingSrv.Iface {
             log.warn("Error with report size limit", ex);
             throw new DatasetTooBig();
         } catch (StorageException ex) {
-            throw wUnavailableResultException(ex);
+            throw unavailableResultException(ex);
         } catch (Exception ex) {
-            throw wUndefinedResultException("Error when handled \"getReports\"", ex);
+            throw undefinedResultException("Error when handled \"getReports\"", ex);
         }
     }
 
@@ -102,9 +103,9 @@ public class FistfulReportsHandler implements ReportingSrv.Iface {
             log.warn("Contract not found", ex);
             throw new ContractNotFound();
         } catch (StorageException ex) {
-            throw wUnavailableResultException(ex);
+            throw unavailableResultException(ex);
         } catch (Exception ex) {
-            throw wUndefinedResultException("Error when handled \"generateReport\"", ex);
+            throw undefinedResultException("Error when handled \"generateReport\"", ex);
         }
     }
 
@@ -118,9 +119,9 @@ public class FistfulReportsHandler implements ReportingSrv.Iface {
         } catch (ReportNotFoundException ex) {
             throw reportNotFound(ex);
         } catch (StorageException ex) {
-            throw wUnavailableResultException(ex);
+            throw unavailableResultException(ex);
         } catch (Exception ex) {
-            throw wUndefinedResultException("Error when handled \"getReport\"", ex);
+            throw undefinedResultException("Error when handled \"getReport\"", ex);
         }
     }
 
@@ -131,9 +132,9 @@ public class FistfulReportsHandler implements ReportingSrv.Iface {
         } catch (ReportNotFoundException ex) {
             throw reportNotFound(ex);
         } catch (StorageException ex) {
-            throw wUnavailableResultException(ex);
+            throw unavailableResultException(ex);
         } catch (Exception ex) {
-            throw wUndefinedResultException("Error when handled \"cancelReport\"", ex);
+            throw undefinedResultException("Error when handled \"cancelReport\"", ex);
         }
     }
 
@@ -142,12 +143,12 @@ public class FistfulReportsHandler implements ReportingSrv.Iface {
         return new ReportNotFound();
     }
 
-    private WUnavailableResultException wUnavailableResultException(StorageException e) {
+    private WUnavailableResultException unavailableResultException(StorageException e) {
         log.error("Error with storage", e);
         return new WUnavailableResultException("Error with storage", e);
     }
 
-    private WUndefinedResultException wUndefinedResultException(String msg, Exception e) {
+    private WUndefinedResultException undefinedResultException(String msg, Exception e) {
         log.error(msg, e);
         return new WUndefinedResultException(msg, e);
     }

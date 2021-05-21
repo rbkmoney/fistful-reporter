@@ -53,7 +53,8 @@ import java.util.function.Supplier;
 @Slf4j
 public abstract class AbstractDaoConfig extends AbstractWithdrawalTestUtils {
 
-    private static TestContainers testContainers = TestContainersBuilder.builderWithTestContainers(getTestContainersParametersSupplier())
+    private static TestContainers testContainers = TestContainersBuilder
+            .builderWithTestContainers(getTestContainersParametersSupplier())
             .addPostgresqlTestContainer()
             .build();
 

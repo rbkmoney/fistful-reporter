@@ -20,7 +20,10 @@ public interface TemplateService {
 
     void processReportFileByTemplate(Report report, OutputStream outputStream) throws IOException;
 
-    default void processTemplate(Context context, InputStream templateStream, OutputStream outputStream) throws IOException {
+    default void processTemplate(
+            Context context,
+            InputStream templateStream,
+            OutputStream outputStream) throws IOException {
         JxlsHelper.getInstance().processTemplate(templateStream, outputStream, context);
     }
 }

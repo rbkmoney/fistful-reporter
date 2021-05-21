@@ -17,7 +17,11 @@ public class PartyManagementClientException extends RuntimeException {
         super(cause);
     }
 
-    public PartyManagementClientException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public PartyManagementClientException(
+            String message,
+            Throwable cause,
+            boolean enableSuppression,
+            boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

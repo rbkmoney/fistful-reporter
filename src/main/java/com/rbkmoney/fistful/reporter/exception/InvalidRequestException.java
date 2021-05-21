@@ -17,7 +17,11 @@ public class InvalidRequestException extends RuntimeException {
         super(cause);
     }
 
-    public InvalidRequestException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public InvalidRequestException(
+            String message,
+            Throwable cause,
+            boolean enableSuppression,
+            boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

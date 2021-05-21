@@ -35,9 +35,8 @@ public class WithdrawalCreatedHandler implements WithdrawalEventHandler {
         try {
             var withdrawalDamsel = change.getChange().getCreated().getWithdrawal();
 
-            log.info("Start withdrawal created handling, eventId={}, withdrawalId={}", event.getEventId(), event.getSourceId());
-
-            Wallet wallet = getWallet(event, withdrawalDamsel.getWalletId());
+            log.info("Start withdrawal created handling, eventId={}, withdrawalId={}",
+                    event.getEventId(), event.getSourceId());
 
             Withdrawal withdrawal = new Withdrawal();
             withdrawal.setExternalId(withdrawalDamsel.getExternalId());
@@ -50,6 +49,7 @@ public class WithdrawalCreatedHandler implements WithdrawalEventHandler {
             withdrawal.setDestinationId(withdrawalDamsel.getDestinationId());
             withdrawal.setWithdrawalStatus(WithdrawalStatus.pending);
 
+            Wallet wallet = getWallet(event, withdrawalDamsel.getWalletId());
             withdrawal.setPartyId(wallet.getPartyId());
             withdrawal.setPartyContractId(wallet.getPartyContractId());
             withdrawal.setIdentityId(wallet.getIdentityId());
@@ -71,7 +71,9 @@ public class WithdrawalCreatedHandler implements WithdrawalEventHandler {
     private Wallet getWallet(MachineEvent event, String walletId) {
         Wallet wallet = walletDao.get(walletId);
         if (wallet == null) {
-            throw new SinkEventNotFoundException(String.format("Wallet not found, withdrawalId='%s', walletId='%s'", event.getSourceId(), walletId));
+            throw new SinkEventNotFoundException(
+                    String.format("Wallet not found, withdrawalId='%s', walletId='%s'",
+                            event.getSourceId(), walletId));
         }
         return wallet;
     }

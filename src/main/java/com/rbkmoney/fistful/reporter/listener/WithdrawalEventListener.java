@@ -39,8 +39,7 @@ public class WithdrawalEventListener {
         log.info("Listening Withdrawal: partition={}, offset={}, batch.size()={}", partition, offset, batch.size());
         try {
             withdrawalEventService.handleEvents(batch.stream().map(SinkEvent::getEvent).collect(toList()));
-        } catch (
-                NotFoundException e) {
+        } catch (NotFoundException e) {
             log.info("Delayed retry caused by an exception", e);
             TimeUnit.MILLISECONDS.sleep(retryDelayMs);
             throw e;

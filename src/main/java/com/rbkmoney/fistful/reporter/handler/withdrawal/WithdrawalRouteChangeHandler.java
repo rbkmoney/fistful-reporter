@@ -33,19 +33,18 @@ public class WithdrawalRouteChangeHandler implements WithdrawalEventHandler {
     @Override
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
-            log.info("Start withdrawal provider id changed handling, eventId={}, withdrawalId={}", event.getEventId(), event.getSourceId());
+            log.info("Start withdrawal provider id changed handling, eventId={}, withdrawalId={}",
+                    event.getEventId(), event.getSourceId());
             Withdrawal withdrawal = withdrawalDao.get(event.getSourceId());
-            Long oldId = withdrawal.getId();
-
             withdrawal.setId(null);
             withdrawal.setWtime(null);
-
             withdrawal.setEventId(event.getEventId());
             withdrawal.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
             withdrawal.setWithdrawalId(event.getSourceId());
             withdrawal.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
             withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_ROUTE_CHANGED);
 
+            Long oldId = withdrawal.getId();
             withdrawalDao.save(withdrawal).ifPresentOrElse(
                     id -> {
                         withdrawalDao.updateNotCurrent(oldId);

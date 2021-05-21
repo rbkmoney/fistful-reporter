@@ -10,34 +10,3 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: fistful_reporter
-  ceph-test-container:
-    image: 'dr.rbkmoney.com/ceph-demo:latest'
-    container_name: ceph-test-container
-    hostname: ceph-test-container
-    ports:
-    - "42827:80"
-    environment:
-      SERVICE_NAME: "ceph-test-container"
-      RGW_NAME: "localhost"
-      NETWORK_AUTO_DETECT: "4"
-      CEPH_DEMO_UID: "ceph-test"
-      CEPH_DEMO_ACCESS_KEY: "test"
-      CEPH_DEMO_SECRET_KEY: "test"
-      CEPH_DEMO_BUCKET: "test"
-  file-storage-test-container:
-    image: 'dr.rbkmoney.com/rbkmoney/file-storage:replace_me_on_last_tag'
-    depends_on:
-    - ceph-test-container
-    container_name: file-storage-test-container
-    hostname: file-storage-test-container
-    network_mode: "host"
-    environment:
-      SERVICE_NAME: "file-storage-test-container"
-      server.port: "42826"
-      storage.endpoint: "localhost:42827"
-      storage.signingRegion: "RU"
-      storage.accessKey: "test"
-      storage.secretKey: "test"
-      storage.clientProtocol: "HTTP"
-      storage.clientMaxErrorRetry: "10"
-      storage.bucketName: "test"

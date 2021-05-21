@@ -17,7 +17,11 @@ public class SinkEventNotFoundException extends RuntimeException {
         super(cause);
     }
 
-    public SinkEventNotFoundException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public SinkEventNotFoundException(
+            String message,
+            Throwable cause,
+            boolean enableSuppression,
+            boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

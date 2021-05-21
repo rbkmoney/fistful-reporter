@@ -33,15 +33,11 @@ public class SourceAccountCreatedHandler implements SourceEventHandler {
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
             Account account = change.getChange().getAccount().getCreated();
-            log.info("Start source account created handling, eventId={}, sourceId={}, identityId={}", event.getEventId(), event.getSourceId(), account.getIdentity());
+            log.info("Start source account created handling, eventId={}, sourceId={}, identityId={}",
+                    event.getEventId(), event.getSourceId(), account.getIdentity());
             Source source = getSource(event);
-            Long oldId = source.getId();
-
-            Identity identity = getIdentity(event, account);
-
             source.setId(null);
             source.setWtime(null);
-
             source.setEventId(event.getEventId());
             source.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
             source.setSourceId(event.getSourceId());
@@ -51,10 +47,12 @@ public class SourceAccountCreatedHandler implements SourceEventHandler {
             source.setAccounterAccountId(account.getAccounterAccountId());
             source.setCurrencyCode(account.getCurrency().getSymbolicCode());
 
+            Identity identity = getIdentity(event, account);
             source.setPartyId(identity.getPartyId());
             source.setPartyContractId(identity.getPartyContractId());
             source.setIdentityId(identity.getIdentityId());
 
+            Long oldId = source.getId();
             sourceDao.save(source).ifPresentOrElse(
                     id -> {
                         sourceDao.updateNotCurrent(oldId);
@@ -79,7 +77,9 @@ public class SourceAccountCreatedHandler implements SourceEventHandler {
     private Identity getIdentity(MachineEvent event, Account account) {
         Identity identity = identityDao.get(account.getIdentity());
         if (identity == null) {
-            throw new SinkEventNotFoundException(String.format("Identity not found, sourceId='%s', identityId='%s'", event.getSourceId(), account.getIdentity()));
+            throw new SinkEventNotFoundException(
+                    String.format("Identity not found, sourceId='%s', identityId='%s'",
+                            event.getSourceId(), account.getIdentity()));
         }
         return identity;
     }

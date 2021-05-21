@@ -136,9 +136,19 @@ public class DaoTests extends AbstractDaoConfig {
         reportDao.changeReportStatus(id, ReportStatus.created);
         assertEquals(4, reportDao.getPendingReports().size());
 
-        assertEquals(5, reportDao.getReportsByRange(partyId, contractId, getFromTime(), getToTime(), emptyList()).size());
+        assertEquals(5, reportDao.getReportsByRange(
+                partyId,
+                contractId,
+                getFromTime(),
+                getToTime(),
+                emptyList()).size());
 
-        assertEquals(0, reportDao.getReportsByRange(partyId, contractId, getFromTime().plusMinutes(1), getToTime(), emptyList()).size());
+        assertEquals(0, reportDao.getReportsByRange(
+                partyId,
+                contractId,
+                getFromTime().plusMinutes(1),
+                getToTime(),
+                emptyList()).size());
     }
 
     @Test

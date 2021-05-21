@@ -12,11 +12,15 @@ import java.util.List;
 
 public interface WithdrawalEventHandler extends EventHandler<TimestampedChange, MachineEvent> {
 
-    default void fillCashFlows(List<FistfulCashFlow> cashFlows, MachineEvent event, WithdrawalEventType withdrawalEventType, long id, TimestampedChange change) {
+    default void fillCashFlows(
+            List<FistfulCashFlow> cashFlows,
+            MachineEvent event,
+            WithdrawalEventType withdrawalEventType,
+            long id,
+            TimestampedChange change) {
         cashFlows.forEach(
                 pcf -> {
                     pcf.setId(null);
-
                     pcf.setEventId(event.getEventId());
                     pcf.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
                     pcf.setSourceId(event.getSourceId());

@@ -90,7 +90,8 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     private HttpPut httpPut(Path file, String fileName, NewFileResult result) throws UnsupportedEncodingException {
         HttpPut requestPut = new HttpPut(result.getUploadUrl());
-        requestPut.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8.name()));
+        requestPut.setHeader("Content-Disposition",
+                "attachment;filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8.name()));
         requestPut.setEntity(new FileEntity(file.toFile()));
         return requestPut;
     }

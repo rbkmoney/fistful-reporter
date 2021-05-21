@@ -32,12 +32,64 @@ public class ReportServiceImpl implements ReportService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public long createReport(String partyId, String contractId, Instant fromTime, Instant toTime, String reportType) {
-        return createReport(partyId, contractId, fromTime, toTime, reportType, reportingProperties.getDefaultTimeZone(), Instant.now());
+        return createReport(
+                partyId,
+                contractId,
+                fromTime,
+                toTime,
+                reportType,
+                reportingProperties.getDefaultTimeZone(),
+                Instant.now());
+    }
+
+    private long createReport(
+            String partyId,
+            String contractId,
+            Instant fromTime,
+            Instant toTime,
+            String reportType,
+            ZoneId timezone,
+            Instant createdAt) {
+        try {
+            log.info(
+                    "Trying to create report, partyId={}, contractId={}, reportType={}, fromTime={}, toTime={}",
+                    partyId, contractId, reportType, fromTime, toTime
+            );
+            Report report = new Report();
+            report.setPartyId(partyId);
+            report.setContractId(contractId);
+            report.setFromTime(LocalDateTime.ofInstant(fromTime, ZoneOffset.UTC));
+            report.setToTime(LocalDateTime.ofInstant(toTime, ZoneOffset.UTC));
+            report.setType(reportType);
+            report.setTimezone(timezone.getId());
+            report.setCreatedAt(LocalDateTime.ofInstant(createdAt, ZoneOffset.UTC));
+            long reportId = reportDao.save(report);
+            log.info(
+                    "Report has been successfully created, " +
+                            "reportId={}, contractId={}, shopId={}, reportType={}, fromTime={}, toTime={}",
+                    reportId, partyId, contractId, reportType, fromTime, toTime
+            );
+            return reportId;
+        } catch (DaoException ex) {
+            throw new StorageException(
+                    String.format(
+                            "Failed to save report in storage, " +
+                                    "partyId=%s, contractId=%s, fromTime=%s, toTime=%s, reportType=%s",
+                            partyId, contractId, fromTime, toTime, reportType
+                    ),
+                    ex
+            );
+        }
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<Report> getReportsByRange(String partyId, String contractId, Instant fromTime, Instant toTime, List<String> reportTypes) {
+    public List<Report> getReportsByRange(
+            String partyId,
+            String contractId,
+            Instant fromTime,
+            Instant toTime,
+            List<String> reportTypes) {
         try {
             log.info("Trying to get reports by range, partyId={}, contractId={}", partyId, contractId);
             List<Report> reportsByRange = reportDao.getReportsByRange(
@@ -52,7 +104,8 @@ public class ReportServiceImpl implements ReportService {
         } catch (DaoException ex) {
             throw new StorageException(
                     String.format(
-                            "Failed to get reports by range, partyId=%s, contractId=%s, fromTime=%s, toTime=%s, reportTypes=%s",
+                            "Failed to get reports by range, " +
+                                    "partyId=%s, contractId=%s, fromTime=%s, toTime=%s, reportTypes=%s",
                             partyId, contractId, fromTime, toTime, reportTypes
                     ),
                     ex
@@ -62,7 +115,11 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<Report> getReportsByRangeNotCancelled(String partyId, String contractId, Instant fromTime, Instant toTime, List<String> reportTypes) {
+    public List<Report> getReportsByRangeNotCancelled(
+            String partyId,
+            String contractId,
+            Instant fromTime, Instant toTime,
+            List<String> reportTypes) {
         return getReportsByRange(partyId, contractId, fromTime, toTime, reportTypes).stream()
                 .filter(report -> report.getStatus() != ReportStatus.cancelled)
                 .collect(Collectors.toList());
@@ -75,7 +132,8 @@ public class ReportServiceImpl implements ReportService {
             log.info("Trying to get report, reportId={}, partyId={}, contractId={}", reportId, partyId, contractId);
             Report report = reportDao.getReport(reportId, partyId, contractId);
             if (report == null) {
-                throw new ReportNotFoundException(String.format("Report not found, partyId=%s, contractId=%s, reportId=%d", partyId, contractId, reportId));
+                throw new ReportNotFoundException(String.format("Report not found, " +
+                        "partyId=%s, contractId=%s, reportId=%d", partyId, contractId, reportId));
             }
             log.info("Report has been found, reportId={}, partyId={}, contractId={}", reportId, partyId, contractId);
             return report;
@@ -105,9 +163,13 @@ public class ReportServiceImpl implements ReportService {
         try {
             log.info("Trying to change report status, reportId={}, reportStatus={}", report.getId(), reportStatus);
             reportDao.changeReportStatus(report.getId(), reportStatus);
-            log.info("Report status has been successfully changed, reportId={}, reportStatus={}", report.getId(), reportStatus);
+            log.info("Report status has been successfully changed, " +
+                    "reportId={}, reportStatus={}", report.getId(), reportStatus);
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to change report status, reportId=%d, reportStatus=%s", report.getId(), reportStatus), ex);
+            throw new StorageException(
+                    String.format("Failed to change report status, " +
+                            "reportId=%d, reportStatus=%s", report.getId(), reportStatus),
+                    ex);
         }
     }
 
@@ -121,41 +183,11 @@ public class ReportServiceImpl implements ReportService {
                     .map(Report::getId)
                     .map(String::valueOf)
                     .collect(Collectors.joining(", ", "[", "]"));
-            log.info("{} reports has been found, reportStatus=pending, reportIds={}", pendingReports.size(), reportIds);
+            log.info("{} reports has been found, " +
+                    "reportStatus=pending, reportIds={}", pendingReports.size(), reportIds);
             return pendingReports;
         } catch (DaoException ex) {
             throw new StorageException("Failed to get pending reports", ex);
-        }
-    }
-
-    private long createReport(String partyId, String contractId, Instant fromTime, Instant toTime, String reportType, ZoneId timezone, Instant createdAt) {
-        try {
-            log.info(
-                    "Trying to create report, partyId={}, contractId={}, reportType={}, fromTime={}, toTime={}",
-                    partyId, contractId, reportType, fromTime, toTime
-            );
-            Report report = new Report();
-            report.setPartyId(partyId);
-            report.setContractId(contractId);
-            report.setFromTime(LocalDateTime.ofInstant(fromTime, ZoneOffset.UTC));
-            report.setToTime(LocalDateTime.ofInstant(toTime, ZoneOffset.UTC));
-            report.setType(reportType);
-            report.setTimezone(timezone.getId());
-            report.setCreatedAt(LocalDateTime.ofInstant(createdAt, ZoneOffset.UTC));
-            long reportId = reportDao.save(report);
-            log.info(
-                    "Report has been successfully created, reportId={}, contractId={}, shopId={}, reportType={}, fromTime={}, toTime={}",
-                    reportId, partyId, contractId, reportType, fromTime, toTime
-            );
-            return reportId;
-        } catch (DaoException ex) {
-            throw new StorageException(
-                    String.format(
-                            "Failed to save report in storage, partyId=%s, contractId=%s, fromTime=%s, toTime=%s, reportType=%s",
-                            partyId, contractId, fromTime, toTime, reportType
-                    ),
-                    ex
-            );
         }
     }
 }

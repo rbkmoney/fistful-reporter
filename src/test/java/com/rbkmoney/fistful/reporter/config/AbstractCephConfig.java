@@ -35,7 +35,8 @@ import java.util.function.Supplier;
 @Slf4j
 public abstract class AbstractCephConfig extends AbstractTestUtils {
 
-    private static TestContainers testContainers = TestContainersBuilder.builderWithTestContainers(getTestContainersParametersSupplier())
+    private static TestContainers testContainers = TestContainersBuilder
+            .builderWithTestContainers(getTestContainersParametersSupplier())
             .addCephTestContainer()
             .addFileStorageTestContainer()
             .build();

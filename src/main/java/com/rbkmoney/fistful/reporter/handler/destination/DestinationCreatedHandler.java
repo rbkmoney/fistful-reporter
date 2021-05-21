@@ -33,9 +33,9 @@ public class DestinationCreatedHandler implements DestinationEventHandler {
     @Override
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
-            log.info("Start destination created handling, eventId={}, destinationId={}", event.getEventId(), event.getSourceId());
+            log.info("Start destination created handling, eventId={}, destinationId={}",
+                    event.getEventId(), event.getSourceId());
             Destination destination = new Destination();
-
             destination.setEventId(event.getEventId());
             destination.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
             destination.setDestinationId(event.getSourceId());

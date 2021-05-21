@@ -49,7 +49,12 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
         for (Wallet wallet : createWallets(identityId, partyId, contractId, walletId)) {
             walletDao.save(wallet);
         }
-        for (Withdrawal withdrawal : createWithdrawals(identityId, partyId, contractId, walletId, getInFromToPeriodTime())) {
+        for (Withdrawal withdrawal : createWithdrawals(
+                identityId,
+                partyId,
+                contractId,
+                walletId,
+                getInFromToPeriodTime())) {
             withdrawalDao.save(withdrawal);
         }
     }
@@ -58,7 +63,11 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
         return createReport(partyId, contractId, getToTime(), getFromTime());
     }
 
-    private com.rbkmoney.fistful.reporter.domain.tables.pojos.Report createReport(String partyId, String contractId, LocalDateTime toTime, LocalDateTime fromTime) {
+    private com.rbkmoney.fistful.reporter.domain.tables.pojos.Report createReport(
+            String partyId,
+            String contractId,
+            LocalDateTime toTime,
+            LocalDateTime fromTime) {
         Report report = new Report();
         report.setPartyId(partyId);
         report.setContractId(contractId);
@@ -96,7 +105,12 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
         return wallets;
     }
 
-    private List<Withdrawal> createWithdrawals(String identityId, String partyId, String contractId, String walletId, LocalDateTime eventCreatedAtTime) {
+    private List<Withdrawal> createWithdrawals(
+            String identityId,
+            String partyId,
+            String contractId,
+            String walletId,
+            LocalDateTime eventCreatedAtTime) {
         List<Withdrawal> withdrawals = new ArrayList<>();
         for (Withdrawal withdrawal : randomListOf(getExpectedSize(), Withdrawal.class)) {
             fillAsReportWithdrawal(identityId, partyId, contractId, walletId, eventCreatedAtTime, withdrawal);
@@ -136,13 +150,25 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
         }
         //filtered by time
         for (Withdrawal withdrawal : randomListOf(4, Withdrawal.class)) {
-            fillAsReportWithdrawal(identityId, partyId, contractId, walletId, eventCreatedAtTime.minusDays(21), withdrawal);
+            fillAsReportWithdrawal(
+                    identityId,
+                    partyId,
+                    contractId,
+                    walletId,
+                    eventCreatedAtTime.minusDays(21),
+                    withdrawal);
             withdrawals.add(withdrawal);
         }
         return withdrawals;
     }
 
-    private void fillAsReportWithdrawal(String identityId, String partyId, String contractId, String walletId, LocalDateTime eventCreatedAtTime, Withdrawal withdrawal) {
+    private void fillAsReportWithdrawal(
+            String identityId,
+            String partyId,
+            String contractId,
+            String walletId,
+            LocalDateTime eventCreatedAtTime,
+            Withdrawal withdrawal) {
         withdrawal.setId(null);
         withdrawal.setWalletId(walletId);
         withdrawal.setWithdrawalStatus(WithdrawalStatus.succeeded);

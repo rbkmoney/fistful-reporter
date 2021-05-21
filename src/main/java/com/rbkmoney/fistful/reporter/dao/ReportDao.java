@@ -11,7 +11,12 @@ public interface ReportDao extends GenericDao {
 
     long save(Report report);
 
-    List<Report> getReportsByRange(String partyId, String contractId, LocalDateTime fromTime, LocalDateTime toTime, List<String> reportTypes);
+    List<Report> getReportsByRange(
+            String partyId,
+            String contractId,
+            LocalDateTime fromTime,
+            LocalDateTime toTime,
+            List<String> reportTypes);
 
     Report getReport(long reportId, String partyId, String contractId);
 

@@ -17,7 +17,11 @@ public class ReportGeneratorException extends RuntimeException {
         super(cause);
     }
 
-    public ReportGeneratorException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public ReportGeneratorException(
+            String message,
+            Throwable cause,
+            boolean enableSuppression,
+            boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

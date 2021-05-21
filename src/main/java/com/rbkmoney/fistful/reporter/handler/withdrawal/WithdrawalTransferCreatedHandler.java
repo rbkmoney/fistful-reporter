@@ -31,22 +31,22 @@ public class WithdrawalTransferCreatedHandler implements WithdrawalEventHandler 
 
     @Override
     public boolean accept(TimestampedChange change) {
-        return change.getChange().isSetTransfer() && change.getChange().getTransfer().isSetPayload() && change.getChange().getTransfer().getPayload().isSetCreated()
-                && change.getChange().getTransfer().getPayload().getCreated().isSetTransfer() && change.getChange().getTransfer().getPayload().getCreated().getTransfer().isSetCashflow();
+        return change.getChange().isSetTransfer()
+                && change.getChange().getTransfer().isSetPayload()
+                && change.getChange().getTransfer().getPayload().isSetCreated()
+                && change.getChange().getTransfer().getPayload().getCreated().isSetTransfer()
+                && change.getChange().getTransfer().getPayload().getCreated().getTransfer().isSetCashflow();
     }
 
     @Override
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
-            List<FinalCashFlowPosting> postings = change.getChange().getTransfer().getPayload().getCreated().getTransfer().getCashflow().getPostings();
 
-            log.info("Start withdrawal transfer created handling, eventId={}, withdrawalId={}, transferChange={}", event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
+            log.info("Start withdrawal transfer created handling, eventId={}, withdrawalId={}, transferChange={}",
+                    event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
             Withdrawal withdrawal = withdrawalDao.get(event.getSourceId());
-            Long oldId = withdrawal.getId();
-
             withdrawal.setId(null);
             withdrawal.setWtime(null);
-
             withdrawal.setEventId(event.getEventId());
             withdrawal.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
             withdrawal.setWithdrawalId(event.getSourceId());
@@ -54,9 +54,12 @@ public class WithdrawalTransferCreatedHandler implements WithdrawalEventHandler 
             withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_TRANSFER_CREATED);
             withdrawal.setWithdrawalTransferStatus(WithdrawalTransferStatus.created);
 
+            List<FinalCashFlowPosting> postings = change.getChange().getTransfer().getPayload()
+                    .getCreated().getTransfer().getCashflow().getPostings();
             withdrawal.setFee(CashFlowConverter.getFistfulFee(postings));
             withdrawal.setProviderFee(CashFlowConverter.getFistfulProviderFee(postings));
 
+            Long oldId = withdrawal.getId();
             withdrawalDao.save(withdrawal).ifPresentOrElse(
                     id -> {
                         withdrawalDao.updateNotCurrent(oldId);
@@ -73,10 +76,12 @@ public class WithdrawalTransferCreatedHandler implements WithdrawalEventHandler 
                                 )
                         );
                         fistfulCashFlowDao.save(fistfulCashFlows);
-                        log.info("Withdrawal transfer have been created, eventId={}, withdrawalId={}, transferChange={}",
+                        log.info("Withdrawal transfer have been created, " +
+                                        "eventId={}, withdrawalId={}, transferChange={}",
                                 event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
                     },
-                    () -> log.info("Withdrawal transfer create bound duplicated, eventId={}, withdrawalId={}, transferChange={}",
+                    () -> log.info("Withdrawal transfer create bound duplicated, " +
+                                    "eventId={}, withdrawalId={}, transferChange={}",
                             event.getEventId(), event.getSourceId(), change.getChange().getTransfer()));
         } catch (DaoException e) {
             throw new StorageException(e);

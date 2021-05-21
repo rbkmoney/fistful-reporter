@@ -31,15 +31,12 @@ public class SourceStatusChangedHandler implements SourceEventHandler {
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
             Status status = change.getChange().getStatus().getStatus();
-
-            log.info("Start source status changed handling, eventId={}, sourceId={}, status={}", event.getEventId(), event.getSourceId(), status);
+            log.info("Start source status changed handling, eventId={}, sourceId={}, status={}",
+                    event.getEventId(), event.getSourceId(), status);
 
             Source source = sourceDao.get(event.getSourceId());
-            Long oldId = source.getId();
-
             source.setId(null);
             source.setWtime(null);
-
             source.setEventId(event.getEventId());
             source.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
             source.setSourceId(event.getSourceId());
@@ -47,6 +44,7 @@ public class SourceStatusChangedHandler implements SourceEventHandler {
             source.setEventType(SourceEventType.SOURCE_STATUS_CHANGED);
             source.setSourceStatus(TBaseUtil.unionFieldToEnum(status, SourceStatus.class));
 
+            Long oldId = source.getId();
             sourceDao.save(source).ifPresentOrElse(
                     id -> {
                         sourceDao.updateNotCurrent(oldId);

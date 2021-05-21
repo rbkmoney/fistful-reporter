@@ -17,7 +17,11 @@ public class FileStorageClientException extends StorageException {
         super(cause);
     }
 
-    public FileStorageClientException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public FileStorageClientException(
+            String message,
+            Throwable cause,
+            boolean enableSuppression,
+            boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

@@ -9,15 +9,17 @@ import java.util.List;
 
 public class ThriftUtils {
 
-    public static Report map(com.rbkmoney.fistful.reporter.domain.tables.pojos.Report report, List<String> fileDataIds) {
-        Report dReport = new Report();
-        dReport.setReportId(report.getId());
-        dReport.setTimeRange(createTimeRange(report));
-        dReport.setCreatedAt(TypeUtil.temporalToString(report.getCreatedAt()));
-        dReport.setReportType(report.getType());
-        dReport.setStatus(ReportStatus.valueOf(report.getStatus().getLiteral()));
-        dReport.setFileDataIds(fileDataIds);
-        return dReport;
+    public static Report map(
+            com.rbkmoney.fistful.reporter.domain.tables.pojos.Report report,
+            List<String> fileDataIds) {
+        Report thriftReport = new Report();
+        thriftReport.setReportId(report.getId());
+        thriftReport.setTimeRange(createTimeRange(report));
+        thriftReport.setCreatedAt(TypeUtil.temporalToString(report.getCreatedAt()));
+        thriftReport.setReportType(report.getType());
+        thriftReport.setStatus(ReportStatus.valueOf(report.getStatus().getLiteral()));
+        thriftReport.setFileDataIds(fileDataIds);
+        return thriftReport;
     }
 
     private static ReportTimeRange createTimeRange(com.rbkmoney.fistful.reporter.domain.tables.pojos.Report report) {

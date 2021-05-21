@@ -41,32 +41,35 @@ public class DepositTransferStatusChangedHandler implements DepositEventHandler 
     @Override
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
-            Status status = change.getChange().getTransfer().getPayload().getStatusChanged().getStatus();
+            log.info("Start deposit transfer status changed handling, eventId={}, depositId={}, transferChange={}",
+                    event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
 
-            log.info("Start deposit transfer status changed handling, eventId={}, depositId={}, transferChange={}", event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
             Deposit deposit = depositDao.get(event.getSourceId());
-            Long oldId = deposit.getId();
-
             deposit.setId(null);
             deposit.setWtime(null);
-
             deposit.setEventId(event.getEventId());
             deposit.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
             deposit.setDepositId(event.getSourceId());
             deposit.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
             deposit.setEventType(DepositEventType.DEPOSIT_TRANSFER_STATUS_CHANGED);
+            Status status = change.getChange().getTransfer().getPayload().getStatusChanged().getStatus();
             deposit.setDepositTransferStatus(TBaseUtil.unionFieldToEnum(status, DepositTransferStatus.class));
 
+            Long oldId = deposit.getId();
             depositDao.save(deposit).ifPresentOrElse(
                     id -> {
                         depositDao.updateNotCurrent(oldId);
-                        List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(deposit.getId(), FistfulCashFlowChangeType.deposit);
+                        List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(
+                                deposit.getId(),
+                                FistfulCashFlowChangeType.deposit);
                         fillCashFlows(cashFlows, event, DepositEventType.DEPOSIT_TRANSFER_STATUS_CHANGED, change, id);
                         fistfulCashFlowDao.save(cashFlows);
-                        log.info("Deposit transfer status has been changed, eventId={}, depositId={}, transferChange={}",
+                        log.info("Deposit transfer status has been changed, " +
+                                        "eventId={}, depositId={}, transferChange={}",
                                 event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
                     },
-                    () -> log.info("Deposit transfer status change bound duplicated, eventId={}, depositId={}, transferChange={}",
+                    () -> log.info("Deposit transfer status change bound duplicated, " +
+                                    "eventId={}, depositId={}, transferChange={}",
                             event.getEventId(), event.getSourceId(), change.getChange().getTransfer())
             );
         } catch (DaoException e) {

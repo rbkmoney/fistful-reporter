@@ -16,7 +16,8 @@ import java.io.IOException;
 public class ClientConfig {
 
     @Bean
-    public PartyManagementSrv.Iface partyManagementClient(PartyManagementProperties partyManagementProperties) throws IOException {
+    public PartyManagementSrv.Iface partyManagementClient(
+            PartyManagementProperties partyManagementProperties) throws IOException {
         return new THSpawnClientBuilder()
                 .withAddress(partyManagementProperties.getUrl().getURI())
                 .withNetworkTimeout(partyManagementProperties.getTimeout())

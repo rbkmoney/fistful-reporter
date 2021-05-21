@@ -27,9 +27,9 @@ public class IdentityCreatedHandler implements IdentityEventHandler {
     @Override
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
-            log.info("Start identity created handling, eventId={}, identityId={}", event.getEventId(), event.getSourceId());
+            log.info("Start identity created handling, eventId={}, identityId={}",
+                    event.getEventId(), event.getSourceId());
             Identity identity = new Identity();
-
             identity.setEventId(event.getEventId());
             identity.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
             identity.setIdentityId(event.getSourceId());

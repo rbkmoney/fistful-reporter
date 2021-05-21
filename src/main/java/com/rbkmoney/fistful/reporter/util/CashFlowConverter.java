@@ -27,10 +27,16 @@ public class CashFlowConverter {
                             fcf.setEventType(DepositEventType.DEPOSIT_STATUS_CHANGED.toString());
                             fcf.setObjId(event.getObjId());
                             fcf.setObjType(event.getCashFlowChangeType());
-                            fcf.setSourceAccountType(TBaseUtil.unionFieldToEnum(cf.getSource().getAccountType(), FistfulCashFlowAccount.class));
+                            fcf.setSourceAccountType(
+                                    TBaseUtil.unionFieldToEnum(
+                                            cf.getSource().getAccountType(),
+                                            FistfulCashFlowAccount.class));
                             fcf.setSourceAccountTypeValue(getCashFlowAccountTypeValue(cf.getSource()));
                             fcf.setSourceAccountId(cf.getSource().getAccountId());
-                            fcf.setDestinationAccountType(TBaseUtil.unionFieldToEnum(cf.getDestination().getAccountType(), FistfulCashFlowAccount.class));
+                            fcf.setDestinationAccountType(
+                                    TBaseUtil.unionFieldToEnum(
+                                            cf.getDestination().getAccountType(),
+                                            FistfulCashFlowAccount.class));
                             fcf.setDestinationAccountTypeValue(getCashFlowAccountTypeValue(cf.getDestination()));
                             fcf.setDestinationAccountId(cf.getDestination().getAccountId());
                             fcf.setAmount(cf.getVolume().getAmount());

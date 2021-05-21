@@ -12,7 +12,12 @@ import java.util.List;
 
 public interface DepositEventHandler extends EventHandler<TimestampedChange, MachineEvent> {
 
-    default void fillCashFlows(List<FistfulCashFlow> cashFlows, MachineEvent event, DepositEventType withdrawalEventType, TimestampedChange change, long id) {
+    default void fillCashFlows(
+            List<FistfulCashFlow> cashFlows,
+            MachineEvent event,
+            DepositEventType withdrawalEventType,
+            TimestampedChange change,
+            long id) {
         cashFlows.forEach(
                 pcf -> {
                     pcf.setId(null);

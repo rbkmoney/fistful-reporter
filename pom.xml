@@ -5,8 +5,8 @@
 
     <parent>
         <groupId>com.rbkmoney</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.8</version>
+        <artifactId>service-parent-pom</artifactId>
+        <version>1.2.2</version>
     </parent>
 
     <artifactId>fistful-reporter</artifactId>
@@ -19,19 +19,15 @@
     <properties>
         <jxls.version>2.8.1</jxls.version>
         <jxls.poi.version>2.8.1</jxls.poi.version>
-        <hikari.version>3.1.0</hikari.version>
         <!---->
         <server.port>8022</server.port>
         <management.port>8023</management.port>
         <exposed.ports>${server.port} ${management.port}</exposed.ports>
         <dockerfile.base.service.tag>c0612d6052ac049496b72a23a04acb142035f249</dockerfile.base.service.tag>
         <dockerfile.registry>${env.REGISTRY}</dockerfile.registry>
-        <shared.resources.version>0.3.8</shared.resources.version>
         <fistful-proto.version>1.113-2943e45</fistful-proto.version>
         <fistful-reporter-proto.version>1.7-8bec5e6</fistful-reporter-proto.version>
         <file-storage-proto.version>1.24-a77c0c4</file-storage-proto.version>
-        <damsel.version>1.473-093c982</damsel.version>
-        <kafka.common.lib.version>0.1.6</kafka.common.lib.version>
         <machinegun-proto.version>1.18-d814d69</machinegun-proto.version>
         <sink-common-lib.version>0.0.7</sink-common-lib.version>
         <!---->
@@ -46,7 +42,7 @@
         <db.embedded.schema>${db.schema}</db.embedded.schema>
         <db.embedded.user>${db.user}</db.embedded.user>
         <db.embedded.password>${db.password}</db.embedded.password>
-        <db.embedded.port>15432</db.embedded.port>
+        <db.embedded.port>5432</db.embedded.port>
         <db.embedded.url>jdbc:postgresql://localhost:${db.embedded.port}/${db.embedded.name}</db.embedded.url>
     </properties>
 
@@ -55,12 +51,10 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>shared-resources</artifactId>
-            <version>${shared.resources.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>kafka-common-lib</artifactId>
-            <version>${kafka.common.lib.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
@@ -80,7 +74,6 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>custom-metrics-spring-boot-starter</artifactId>
-            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
@@ -95,22 +88,22 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>damsel</artifactId>
-            <version>${damsel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rbkmoney</groupId>
+            <artifactId>mamsel</artifactId>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>db-common-lib</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>custom-actuator-endpoints</artifactId>
-            <version>0.0.4</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.geck</groupId>
             <artifactId>serializer</artifactId>
-            <version>0.6.11</version>
         </dependency>
 
         <!--spring-->
@@ -145,27 +138,22 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>${hikari.version}</version>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>${flyway.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
-            <version>${jooq.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -273,7 +261,7 @@
                 </dependencies>
                 <configuration>
                     <resourceBundles>
-                        <resourceBundle>com.rbkmoney:shared-resources:${shared.resources.version}</resourceBundle>
+                        <resourceBundle>com.rbkmoney:shared-resources:${shared-resources.version}</resourceBundle>
                     </resourceBundles>
                     <attachToMain>false</attachToMain>
                     <attachToTest>false</attachToTest>
@@ -289,7 +277,6 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>${flyway.version}</version>
                 <configuration>
                     <url>${db.embedded.url}</url>
                     <user>${db.embedded.user}</user>
@@ -319,7 +306,6 @@
             <plugin>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
-                <version>${jooq.version}</version>
                 <configuration>
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>

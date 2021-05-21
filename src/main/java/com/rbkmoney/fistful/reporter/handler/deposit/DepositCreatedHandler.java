@@ -33,23 +33,23 @@ public class DepositCreatedHandler implements DepositEventHandler {
     @Override
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
-            var depositDamsel = change.getChange().getCreated().getDeposit();
 
-            log.info("Start deposit created handling, eventId={}, depositId={}", event.getEventId(), event.getSourceId());
-
-            Wallet wallet = getWallet(event, depositDamsel.getWalletId());
+            log.info("Start deposit created handling, eventId={}, depositId={}",
+                    event.getEventId(), event.getSourceId());
 
             Deposit deposit = new Deposit();
-
             deposit.setEventId(event.getEventId());
             deposit.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
             deposit.setDepositId(event.getSourceId());
             deposit.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
             deposit.setEventType(DepositEventType.DEPOSIT_CREATED);
+
+            var depositDamsel = change.getChange().getCreated().getDeposit();
             deposit.setWalletId(depositDamsel.getWalletId());
             deposit.setSourceId(depositDamsel.getSourceId());
             deposit.setDepositStatus(DepositStatus.pending);
 
+            Wallet wallet = getWallet(event, depositDamsel.getWalletId());
             deposit.setPartyId(wallet.getPartyId());
             deposit.setPartyContractId(wallet.getPartyContractId());
             deposit.setIdentityId(wallet.getIdentityId());
@@ -71,7 +71,8 @@ public class DepositCreatedHandler implements DepositEventHandler {
     private Wallet getWallet(MachineEvent event, String walletId) {
         Wallet wallet = walletDao.get(walletId);
         if (wallet == null) {
-            throw new SinkEventNotFoundException(String.format("Wallet not found, destinationId='%s', walletId='%s'", event.getEventId(), walletId));
+            throw new SinkEventNotFoundException(String.format("Wallet not found, " +
+                    "destinationId='%s', walletId='%s'", event.getEventId(), walletId));
         }
         return wallet;
     }

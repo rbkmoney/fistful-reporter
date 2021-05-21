@@ -95,8 +95,7 @@ public class ReportGenerator {
                         "toTime=%s, " +
                         "createdAt=%s, " +
                         "reportType=%s, " +
-                        "status=%s"
-                ,
+                        "status=%s",
                 report.getId(),
                 report.getPartyId(),
                 report.getContractId(),

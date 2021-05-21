@@ -30,40 +30,51 @@ public class WithdrawalTransferStatusChangedHandler implements WithdrawalEventHa
 
     @Override
     public boolean accept(TimestampedChange change) {
-        return change.getChange().isSetTransfer() && change.getChange().getTransfer().isSetPayload() && change.getChange().getTransfer().getPayload().isSetStatusChanged()
+        return change.getChange().isSetTransfer()
+                && change.getChange().getTransfer().isSetPayload()
+                && change.getChange().getTransfer().getPayload().isSetStatusChanged()
                 && change.getChange().getTransfer().getPayload().getStatusChanged().isSetStatus();
     }
 
     @Override
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
-            Status status = change.getChange().getTransfer().getPayload().getStatusChanged().getStatus();
 
-            log.info("Start withdrawal transfer status changed handling, eventId={}, withdrawalId={}, transferChange={}", event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
+            log.info("Start withdrawal transfer status changed handling, " +
+                    "eventId={}, withdrawalId={}, transferChange={}",
+                    event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
 
             Withdrawal withdrawal = withdrawalDao.get(event.getSourceId());
-            Long oldId = withdrawal.getId();
-
             withdrawal.setId(null);
             withdrawal.setWtime(null);
-
             withdrawal.setEventId(event.getEventId());
             withdrawal.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
             withdrawal.setWithdrawalId(event.getSourceId());
             withdrawal.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
             withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_TRANSFER_STATUS_CHANGED);
+            Status status = change.getChange().getTransfer().getPayload().getStatusChanged().getStatus();
             withdrawal.setWithdrawalTransferStatus(TBaseUtil.unionFieldToEnum(status, WithdrawalTransferStatus.class));
 
+            Long oldId = withdrawal.getId();
             withdrawalDao.save(withdrawal).ifPresentOrElse(
                     id -> {
                         withdrawalDao.updateNotCurrent(oldId);
-                        List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(withdrawal.getId(), FistfulCashFlowChangeType.withdrawal);
-                        fillCashFlows(cashFlows, event, WithdrawalEventType.WITHDRAWAL_TRANSFER_STATUS_CHANGED, id, change);
+                        List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(
+                                withdrawal.getId(),
+                                FistfulCashFlowChangeType.withdrawal);
+                        fillCashFlows(
+                                cashFlows,
+                                event,
+                                WithdrawalEventType.WITHDRAWAL_TRANSFER_STATUS_CHANGED,
+                                id,
+                                change);
                         fistfulCashFlowDao.save(cashFlows);
-                        log.info("Withdrawal transfer status have been status changed, eventId={}, withdrawalId={}, transferChange={}",
+                        log.info("Withdrawal transfer status have been status changed, " +
+                                        "eventId={}, withdrawalId={}, transferChange={}",
                                 event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
                     },
-                    () -> log.info("Withdrawal transfer status change bound duplicated, eventId={}, withdrawalId={}, transferChange={}",
+                    () -> log.info("Withdrawal transfer status change bound duplicated, " +
+                                    "eventId={}, withdrawalId={}, transferChange={}",
                             event.getEventId(), event.getSourceId(), change.getChange().getTransfer()));
         } catch (DaoException e) {
             throw new StorageException(e);

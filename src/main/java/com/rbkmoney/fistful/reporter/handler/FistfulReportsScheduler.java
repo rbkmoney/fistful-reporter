@@ -37,7 +37,8 @@ public class FistfulReportsScheduler {
                             .map(String::valueOf)
                             .collect(Collectors.joining(", ", "[", "]"));
                     Report report = pendingReports.get(0);
-                    log.info("{} reports in queue for building, reportIds={}, now start report building for reportId={}",
+                    log.info("{} reports in queue for building, reportIds={}, " +
+                                    "now start report building for reportId={}",
                             pendingReports.size(), reportIds, report.getId());
                     reportGenerator.generateReportFile(report);
                 }

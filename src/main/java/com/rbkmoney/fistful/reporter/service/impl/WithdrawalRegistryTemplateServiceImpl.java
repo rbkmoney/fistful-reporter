@@ -51,7 +51,9 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
     public void processReportFileByTemplate(Report report, OutputStream outputStream) throws IOException {
         ZoneId reportZoneId = ZoneId.of(report.getTimezone());
         String fromTime = TimeUtils.toLocalizedDate(report.getFromTime().toInstant(ZoneOffset.UTC), reportZoneId);
-        String toTime = TimeUtils.toLocalizedDate(report.getToTime().minusNanos(1).toInstant(ZoneOffset.UTC), reportZoneId);
+        String toTime = TimeUtils.toLocalizedDate(
+                report.getToTime().minusNanos(1).toInstant(ZoneOffset.UTC),
+                reportZoneId);
         LongAdder inc = new LongAdder();
 
         // keep 100 rows in memory, exceeding rows will be flushed to disk
@@ -91,9 +93,11 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
                     row.createCell(0).setCellValue(getTime(withdrawal.getEventCreatedAt(), reportZoneId));
                     row.createCell(1).setCellValue(withdrawal.getWithdrawalId());
                     row.createCell(2).setCellValue(withdrawal.getWalletId());
-                    row.createCell(3).setCellValue(FormatUtils.formatCurrency(withdrawal.getAmount(), withdrawal.getCurrencyCode()));
+                    row.createCell(3).setCellValue(
+                            FormatUtils.formatCurrency(withdrawal.getAmount(), withdrawal.getCurrencyCode()));
                     row.createCell(4).setCellValue(withdrawal.getCurrencyCode());
-                    row.createCell(5).setCellValue(FormatUtils.formatCurrency(withdrawal.getFee(), withdrawal.getCurrencyCode()));
+                    row.createCell(5).setCellValue(
+                            FormatUtils.formatCurrency(withdrawal.getFee(), withdrawal.getCurrencyCode()));
                     row.createCell(6).setCellValue(withdrawal.getExternalId());
                     inc.increment();
                 }
@@ -121,22 +125,22 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
 
     private void createFirstRow(Sheet sh, Font font, LongAdder inc, String fromTime, String toTime) {
         Row firstRow = sh.createRow(inc.intValue());
-        configUIFirstRow(sh, firstRow);
+        configUiFirstRow(sh, firstRow);
 
         Cell firstRowFirstCell = firstRow.getCell(0);
-        configUIFirstRowFirstCell(font, firstRowFirstCell);
+        configUiFirstRowFirstCell(font, firstRowFirstCell);
         initDataFirstRowFirstCell(fromTime, toTime, firstRowFirstCell);
         inc.increment();
     }
 
-    private void configUIFirstRow(Sheet sh, Row firstRow) {
+    private void configUiFirstRow(Sheet sh, Row firstRow) {
         for (int i = 0; i < CELLS_COUNT; i++) {
             firstRow.createCell(i);
         }
         sh.addMergedRegion(new CellRangeAddress(0, 0, 0, CELLS_COUNT - 1));
     }
 
-    private void configUIFirstRowFirstCell(Font font, Cell firstRowFirstCell) {
+    private void configUiFirstRowFirstCell(Font font, Cell firstRowFirstCell) {
         CellUtil.setAlignment(firstRowFirstCell, HorizontalAlignment.CENTER);
         CellUtil.setFont(firstRowFirstCell, font);
     }
@@ -147,19 +151,19 @@ public class WithdrawalRegistryTemplateServiceImpl implements TemplateService {
 
     private void createSecondRow(Sheet sh, Font font, LongAdder inc, CellStyle greyStyle) {
         Row secondRow = sh.createRow(inc.intValue());
-        configUISecondRowAllCells(font, greyStyle, secondRow);
+        configUiSecondRowAllCells(font, greyStyle, secondRow);
         initDataSecondRowAllCell(secondRow);
         inc.increment();
     }
 
-    private void configUISecondRowAllCells(Font font, CellStyle greyStyle, Row secondRow) {
+    private void configUiSecondRowAllCells(Font font, CellStyle greyStyle, Row secondRow) {
         for (int i = 0; i < CELLS_COUNT; ++i) {
             Cell cell = secondRow.createCell(i);
-            configUISecondRow(font, greyStyle, cell);
+            configUiSecondRow(font, greyStyle, cell);
         }
     }
 
-    private void configUISecondRow(Font font, CellStyle greyStyle, Cell cell) {
+    private void configUiSecondRow(Font font, CellStyle greyStyle, Cell cell) {
         CellUtil.setAlignment(cell, HorizontalAlignment.CENTER);
         cell.setCellStyle(greyStyle);
         CellUtil.setFont(cell, font);

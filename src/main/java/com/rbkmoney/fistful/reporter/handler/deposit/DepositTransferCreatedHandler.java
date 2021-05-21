@@ -42,6 +42,19 @@ public class DepositTransferCreatedHandler implements DepositEventHandler {
     @Override
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
+            log.info("Start deposit transfer created handling, eventId={}, depositId={}, transferChange={}",
+                    event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
+
+            Deposit deposit = depositDao.get(event.getSourceId());
+            deposit.setId(null);
+            deposit.setWtime(null);
+            deposit.setEventId(event.getEventId());
+            deposit.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+            deposit.setDepositId(event.getSourceId());
+            deposit.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
+            deposit.setEventType(DepositEventType.DEPOSIT_TRANSFER_CREATED);
+            deposit.setDepositTransferStatus(DepositTransferStatus.created);
+
             List<FinalCashFlowPosting> postings = change
                     .getChange()
                     .getTransfer()
@@ -50,25 +63,10 @@ public class DepositTransferCreatedHandler implements DepositEventHandler {
                     .getTransfer()
                     .getCashflow()
                     .getPostings();
-
-            log.info("Start deposit transfer created handling, eventId={}, depositId={}, transferChange={}", event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
-
-            Deposit deposit = depositDao.get(event.getSourceId());
-            Long oldId = deposit.getId();
-
-            deposit.setId(null);
-            deposit.setWtime(null);
-
-            deposit.setEventId(event.getEventId());
-            deposit.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-            deposit.setDepositId(event.getSourceId());
-            deposit.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
-            deposit.setEventType(DepositEventType.DEPOSIT_TRANSFER_CREATED);
-            deposit.setDepositTransferStatus(DepositTransferStatus.created);
-
             deposit.setFee(CashFlowConverter.getFistfulFee(postings));
             deposit.setProviderFee(CashFlowConverter.getFistfulProviderFee(postings));
 
+            Long oldId = deposit.getId();
             depositDao.save(deposit).ifPresentOrElse(
                     id -> {
                         depositDao.updateNotCurrent(oldId);

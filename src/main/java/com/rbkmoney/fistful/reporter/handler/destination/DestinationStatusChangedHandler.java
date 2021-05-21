@@ -31,14 +31,12 @@ public class DestinationStatusChangedHandler implements DestinationEventHandler 
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
             Status status = change.getChange().getStatus().getChanged();
-            log.info("Start destination status changed handling, eventId={}, destinationId={}, status={}", event.getEventId(), event.getSourceId(), status);
+            log.info("Start destination status changed handling, eventId={}, destinationId={}, status={}",
+                    event.getEventId(), event.getSourceId(), status);
 
             Destination destination = destinationDao.get(event.getSourceId());
-            Long oldId = destination.getId();
-
             destination.setId(null);
             destination.setWtime(null);
-
             destination.setEventId(event.getEventId());
             destination.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
             destination.setDestinationId(event.getSourceId());
@@ -46,15 +44,16 @@ public class DestinationStatusChangedHandler implements DestinationEventHandler 
             destination.setEventType(DestinationEventType.DESTINATION_STATUS_CHANGED);
             destination.setDestinationStatus(TBaseUtil.unionFieldToEnum(status, DestinationStatus.class));
 
+            Long oldId = destination.getId();
             destinationDao.save(destination).ifPresentOrElse(
                     id -> {
                         destinationDao.updateNotCurrent(oldId);
                         log.info("Destination status has been changed, eventId={}, destinationId={}, status={}",
                                 event.getEventId(), event.getSourceId(), status);
                     },
-                    () -> log.info("Destination status changed bound duplicated, eventId={}, destinationId={}, status={}",
-                            event.getEventId(), event.getSourceId(), status)
-            );
+                    () -> log.info("Destination status changed bound duplicated, " +
+                                    "eventId={}, destinationId={}, status={}",
+                            event.getEventId(), event.getSourceId(), status));
         } catch (DaoException e) {
             throw new StorageException(e);
         }

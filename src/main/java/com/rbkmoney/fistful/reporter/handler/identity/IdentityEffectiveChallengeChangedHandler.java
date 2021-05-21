@@ -27,13 +27,12 @@ public class IdentityEffectiveChallengeChangedHandler implements IdentityEventHa
     @Override
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
-            log.info("Start effective identity challenge changed handling, eventId={}, identityId={}, effectiveChallengeId={}", event.getEventId(), event.getSourceId(), change.getChange().getEffectiveChallengeChanged());
+            log.info("Start effective identity challenge changed handling, " +
+                            "eventId={}, identityId={}, effectiveChallengeId={}",
+                    event.getEventId(), event.getSourceId(), change.getChange().getEffectiveChallengeChanged());
             Identity identity = identityDao.get(event.getSourceId());
-            Long oldId = identity.getId();
-
             identity.setId(null);
             identity.setWtime(null);
-
             identity.setEventId(event.getEventId());
             identity.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
             identity.setIdentityId(event.getSourceId());
@@ -41,15 +40,19 @@ public class IdentityEffectiveChallengeChangedHandler implements IdentityEventHa
             identity.setEventType(IdentityEventType.IDENTITY_EFFECTIVE_CHALLENGE_CHANGED);
             identity.setIdentityEffectiveChalengeId(change.getChange().getEffectiveChallengeChanged());
 
+            Long oldId = identity.getId();
             identityDao.save(identity).ifPresentOrElse(
                     id -> {
                         identityDao.updateNotCurrent(oldId);
-                        log.info("Effective identity challenge has been changed, eventId={}, identityId={}, effectiveChallengeId={}",
-                                event.getEventId(), event.getSourceId(), change.getChange().getEffectiveChallengeChanged());
+                        log.info("Effective identity challenge has been changed, " +
+                                        "eventId={}, identityId={}, effectiveChallengeId={}",
+                                event.getEventId(), event.getSourceId(),
+                                change.getChange().getEffectiveChallengeChanged());
                     },
-                    () -> log.info("Effective identity challenge bound duplicated, eventId={}, identityId={}, effectiveChallengeId={}",
-                            event.getEventId(), event.getSourceId(), change.getChange().getEffectiveChallengeChanged())
-            );
+                    () -> log.info("Effective identity challenge bound duplicated, " +
+                                    "eventId={}, identityId={}, effectiveChallengeId={}",
+                            event.getEventId(), event.getSourceId(),
+                            change.getChange().getEffectiveChallengeChanged()));
         } catch (DaoException e) {
             throw new StorageException(e);
         }

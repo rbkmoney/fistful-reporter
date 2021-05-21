@@ -38,41 +38,54 @@ public class IdentityChallengeStatusChangedHandler implements IdentityEventHandl
         try {
             ChallengeChange challengeChange = change.getChange().getIdentityChallenge();
             ChallengeStatus status = challengeChange.getPayload().getStatusChanged();
-            log.info("Start identity challenge status changed handling, eventId={}, identityId={}, challengeId={}, status={}", event.getEventId(), event.getSourceId(), challengeChange.getId(), status);
+            log.info("Start identity challenge status changed handling, " +
+                    "eventId={}, identityId={}, challengeId={}, status={}",
+                    event.getEventId(), event.getSourceId(), challengeChange.getId(), status);
+
             updateChallenge(event, challengeChange, status, change);
+            log.info("Challenge status changed handling: update identity, eventId={}, identityId={}",
+                    event.getEventId(), event.getSourceId());
 
-            log.info("Challenge status changed handling: update identity, eventId={}, identityId={}", event.getEventId(), event.getSourceId());
             updateIdentity(event, change);
-            log.info("Challenge status changed handling: identity has been updated, eventId={}, identityId={}", event.getEventId(), event.getSourceId());
+            log.info("Challenge status changed handling: identity has been updated, eventId={}, identityId={}",
+                    event.getEventId(), event.getSourceId());
 
-            log.info("Identity challenge status has been changed, eventId={}, identityId={}, challengeId={}, status={}", event.getEventId(), event.getSourceId(), challengeChange.getId(), status);
+            log.info("Identity challenge status has been changed, " +
+                    "eventId={}, identityId={}, challengeId={}, status={}",
+                    event.getEventId(), event.getSourceId(), challengeChange.getId(), status);
         } catch (DaoException e) {
             throw new StorageException(e);
         }
     }
 
-    private void updateChallenge(MachineEvent event, ChallengeChange challengeChange, ChallengeStatus status, TimestampedChange change) {
-        com.rbkmoney.fistful.reporter.domain.tables.pojos.Challenge challenge = challengeDao.get(event.getSourceId(), challengeChange.getId());
-        Long oldId = challenge.getId();
-
+    private void updateChallenge(
+            MachineEvent event,
+            ChallengeChange challengeChange,
+            ChallengeStatus status,
+            TimestampedChange change) {
+        var challenge = challengeDao.get(event.getSourceId(), challengeChange.getId());
         challenge.setId(null);
         challenge.setWtime(null);
-
         challenge.setEventId(event.getEventId());
         challenge.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
         challenge.setIdentityId(event.getSourceId());
         challenge.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
         challenge.setEventType(ChallengeEventType.CHALLENGE_STATUS_CHANGED);
         challenge.setChallengeId(challengeChange.getId());
-        challenge.setChallengeStatus(TBaseUtil.unionFieldToEnum(status, com.rbkmoney.fistful.reporter.domain.enums.ChallengeStatus.class));
+        challenge.setChallengeStatus(
+                TBaseUtil.unionFieldToEnum(status, com.rbkmoney.fistful.reporter.domain.enums.ChallengeStatus.class));
         if (status.isSetCompleted()) {
             ChallengeCompleted challengeCompleted = status.getCompleted();
-            challenge.setChallengeResolution(TypeUtil.toEnumField(challengeCompleted.getResolution().toString(), com.rbkmoney.fistful.reporter.domain.enums.ChallengeResolution.class));
+            challenge.setChallengeResolution(
+                    TypeUtil.toEnumField(
+                            challengeCompleted.getResolution().toString(),
+                            com.rbkmoney.fistful.reporter.domain.enums.ChallengeResolution.class));
             if (challengeCompleted.isSetValidUntil()) {
                 challenge.setChallengeValidUntil(TypeUtil.stringToLocalDateTime(challengeCompleted.getValidUntil()));
             }
         }
 
+        Long oldId = challenge.getId();
         challengeDao.save(challenge).ifPresentOrElse(
                 id -> {
                     challengeDao.updateNotCurrent(oldId);
@@ -86,17 +99,15 @@ public class IdentityChallengeStatusChangedHandler implements IdentityEventHandl
 
     private void updateIdentity(MachineEvent event, TimestampedChange change) {
         Identity identity = identityDao.get(event.getSourceId());
-        Long oldId = identity.getId();
-
         identity.setId(null);
         identity.setWtime(null);
-
         identity.setEventId(event.getEventId());
         identity.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
         identity.setIdentityId(event.getSourceId());
         identity.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
         identity.setEventType(IdentityEventType.IDENTITY_CHALLENGE_STATUS_CHANGED);
 
+        Long oldId = identity.getId();
         identityDao.save(identity).ifPresentOrElse(
                 id -> {
                     identityDao.updateNotCurrent(oldId);

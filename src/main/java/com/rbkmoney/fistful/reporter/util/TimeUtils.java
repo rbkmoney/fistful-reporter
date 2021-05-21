@@ -8,7 +8,8 @@ import java.time.format.DateTimeFormatter;
 
 public class TimeUtils {
 
-    private static final DateTimeFormatter DEFAULT_DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+    private static final DateTimeFormatter DEFAULT_DATE_TIME_FORMAT =
+            DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
     private static final DateTimeFormatter DEFAULT_DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     public static String toLocalizedDate(String dateTimeUtc, ZoneId zoneId) {

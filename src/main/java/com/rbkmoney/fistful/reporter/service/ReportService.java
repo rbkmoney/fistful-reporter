@@ -10,9 +10,19 @@ public interface ReportService {
 
     long createReport(String partyId, String contractId, Instant fromTime, Instant toTime, String reportType);
 
-    List<Report> getReportsByRange(String partyId, String contractId, Instant fromTime, Instant toTime, List<String> reportTypes);
+    List<Report> getReportsByRange(
+            String partyId,
+            String contractId,
+            Instant fromTime,
+            Instant toTime,
+            List<String> reportTypes);
 
-    List<Report> getReportsByRangeNotCancelled(String partyId, String contractId, Instant fromTime, Instant toTime, List<String> reportTypes);
+    List<Report> getReportsByRangeNotCancelled(
+            String partyId,
+            String contractId,
+            Instant fromTime,
+            Instant toTime,
+            List<String> reportTypes);
 
     Report getReport(String partyId, String contractId, long reportId);
 
