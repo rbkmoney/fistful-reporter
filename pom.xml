@@ -43,7 +43,7 @@
         <db.embedded.schema>${db.schema}</db.embedded.schema>
         <db.embedded.user>${db.user}</db.embedded.user>
         <db.embedded.password>${db.password}</db.embedded.password>
-        <db.embedded.port>5432</db.embedded.port>
+        <db.embedded.port>15432</db.embedded.port>
         <db.embedded.url>jdbc:postgresql://localhost:${db.embedded.port}/${db.embedded.name}</db.embedded.url>
     </properties>
 
