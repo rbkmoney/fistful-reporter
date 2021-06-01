@@ -30,22 +30,11 @@ public class IdentityEffectiveChallengeChangedHandler implements IdentityEventHa
             log.info("Start effective identity challenge changed handling, " +
                             "eventId={}, identityId={}, effectiveChallengeId={}",
                     event.getEventId(), event.getSourceId(), change.getChange().getEffectiveChallengeChanged());
-            Identity identity = identityDao.get(event.getSourceId());
-
-            Long oldId = identity.getId();
-
-            identity.setId(null);
-            identity.setWtime(null);
-            identity.setEventId(event.getEventId());
-            identity.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-            identity.setIdentityId(event.getSourceId());
-            identity.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
-            identity.setEventType(IdentityEventType.IDENTITY_EFFECTIVE_CHALLENGE_CHANGED);
-            identity.setIdentityEffectiveChalengeId(change.getChange().getEffectiveChallengeChanged());
-
-            identityDao.save(identity).ifPresentOrElse(
+            Identity oldIdentity = identityDao.get(event.getSourceId());
+            Identity updatedIdentity = update(oldIdentity, change, event);
+            identityDao.save(updatedIdentity).ifPresentOrElse(
                     id -> {
-                        identityDao.updateNotCurrent(oldId);
+                        identityDao.updateNotCurrent(oldIdentity.getId());
                         log.info("Effective identity challenge has been changed, " +
                                         "eventId={}, identityId={}, effectiveChallengeId={}",
                                 event.getEventId(), event.getSourceId(),
@@ -58,5 +47,21 @@ public class IdentityEffectiveChallengeChangedHandler implements IdentityEventHa
         } catch (DaoException e) {
             throw new StorageException(e);
         }
+    }
+
+    private Identity update(
+            Identity oldIdentity,
+            TimestampedChange change,
+            MachineEvent event) {
+        Identity identity = new Identity(oldIdentity);
+        identity.setId(null);
+        identity.setWtime(null);
+        identity.setEventId(event.getEventId());
+        identity.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        identity.setIdentityId(event.getSourceId());
+        identity.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
+        identity.setEventType(IdentityEventType.IDENTITY_EFFECTIVE_CHALLENGE_CHANGED);
+        identity.setIdentityEffectiveChalengeId(change.getChange().getEffectiveChallengeChanged());
+        return identity;
     }
 }

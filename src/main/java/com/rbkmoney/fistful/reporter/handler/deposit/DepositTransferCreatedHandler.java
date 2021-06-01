@@ -5,9 +5,7 @@ import com.rbkmoney.fistful.cashflow.FinalCashFlowPosting;
 import com.rbkmoney.fistful.deposit.TimestampedChange;
 import com.rbkmoney.fistful.reporter.dao.DepositDao;
 import com.rbkmoney.fistful.reporter.dao.FistfulCashFlowDao;
-import com.rbkmoney.fistful.reporter.domain.enums.DepositEventType;
-import com.rbkmoney.fistful.reporter.domain.enums.DepositTransferStatus;
-import com.rbkmoney.fistful.reporter.domain.enums.FistfulCashFlowChangeType;
+import com.rbkmoney.fistful.reporter.domain.enums.*;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Deposit;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.FistfulCashFlow;
 import com.rbkmoney.fistful.reporter.dto.FistfulCashFlowSinkEvent;
@@ -44,20 +42,6 @@ public class DepositTransferCreatedHandler implements DepositEventHandler {
         try {
             log.info("Start deposit transfer created handling, eventId={}, depositId={}, transferChange={}",
                     event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
-
-            Deposit deposit = depositDao.get(event.getSourceId());
-
-            Long oldId = deposit.getId();
-
-            deposit.setId(null);
-            deposit.setWtime(null);
-            deposit.setEventId(event.getEventId());
-            deposit.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-            deposit.setDepositId(event.getSourceId());
-            deposit.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
-            deposit.setEventType(DepositEventType.DEPOSIT_TRANSFER_CREATED);
-            deposit.setDepositTransferStatus(DepositTransferStatus.created);
-
             List<FinalCashFlowPosting> postings = change
                     .getChange()
                     .getTransfer()
@@ -66,12 +50,11 @@ public class DepositTransferCreatedHandler implements DepositEventHandler {
                     .getTransfer()
                     .getCashflow()
                     .getPostings();
-            deposit.setFee(CashFlowConverter.getFistfulFee(postings));
-            deposit.setProviderFee(CashFlowConverter.getFistfulProviderFee(postings));
-
-            depositDao.save(deposit).ifPresentOrElse(
+            Deposit oldDeposit = depositDao.get(event.getSourceId());
+            Deposit updatedDeposit = update(oldDeposit, change, event, postings);
+            depositDao.save(updatedDeposit).ifPresentOrElse(
                     id -> {
-                        depositDao.updateNotCurrent(oldId);
+                        depositDao.updateNotCurrent(oldDeposit.getId());
                         List<FistfulCashFlow> fistfulCashFlows = CashFlowConverter.convertFistfulCashFlows(
                                 new FistfulCashFlowSinkEvent(
                                         event.getEventId(),
@@ -94,5 +77,26 @@ public class DepositTransferCreatedHandler implements DepositEventHandler {
         } catch (DaoException e) {
             throw new StorageException(e);
         }
+    }
+
+    private Deposit update(
+            Deposit oldDeposit,
+            TimestampedChange change,
+            MachineEvent event,
+            List<FinalCashFlowPosting> postings) {
+        Deposit deposit = new Deposit(oldDeposit);
+        deposit.setId(null);
+        deposit.setWtime(null);
+        deposit.setEventId(event.getEventId());
+        deposit.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        deposit.setDepositId(event.getSourceId());
+        deposit.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
+        deposit.setEventType(DepositEventType.DEPOSIT_TRANSFER_CREATED);
+        deposit.setDepositTransferStatus(DepositTransferStatus.created);
+
+
+        deposit.setFee(CashFlowConverter.getFistfulFee(postings));
+        deposit.setProviderFee(CashFlowConverter.getFistfulProviderFee(postings));
+        return deposit;
     }
 }

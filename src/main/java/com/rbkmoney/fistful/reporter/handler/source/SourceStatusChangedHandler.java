@@ -33,23 +33,11 @@ public class SourceStatusChangedHandler implements SourceEventHandler {
             Status status = change.getChange().getStatus().getStatus();
             log.info("Start source status changed handling, eventId={}, sourceId={}, status={}",
                     event.getEventId(), event.getSourceId(), status);
-
-            Source source = sourceDao.get(event.getSourceId());
-
-            Long oldId = source.getId();
-
-            source.setId(null);
-            source.setWtime(null);
-            source.setEventId(event.getEventId());
-            source.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-            source.setSourceId(event.getSourceId());
-            source.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
-            source.setEventType(SourceEventType.SOURCE_STATUS_CHANGED);
-            source.setSourceStatus(TBaseUtil.unionFieldToEnum(status, SourceStatus.class));
-
-            sourceDao.save(source).ifPresentOrElse(
+            Source oldSource = sourceDao.get(event.getSourceId());
+            Source updatedSource = update(oldSource, change, event, status);
+            sourceDao.save(updatedSource).ifPresentOrElse(
                     id -> {
-                        sourceDao.updateNotCurrent(oldId);
+                        sourceDao.updateNotCurrent(oldSource.getId());
                         log.info("Source status have been changed, eventId={}, sourceId={}, status={}",
                                 event.getEventId(), event.getSourceId(), status);
                     },
@@ -58,5 +46,22 @@ public class SourceStatusChangedHandler implements SourceEventHandler {
         } catch (DaoException e) {
             throw new StorageException(e);
         }
+    }
+
+    private Source update(
+            Source oldSource,
+            TimestampedChange change,
+            MachineEvent event,
+            Status status) {
+        Source source = new Source(oldSource);
+        source.setId(null);
+        source.setWtime(null);
+        source.setEventId(event.getEventId());
+        source.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        source.setSourceId(event.getSourceId());
+        source.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
+        source.setEventType(SourceEventType.SOURCE_STATUS_CHANGED);
+        source.setSourceStatus(TBaseUtil.unionFieldToEnum(status, SourceStatus.class));
+        return source;
     }
 }

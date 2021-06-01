@@ -1,14 +1,11 @@
 package com.rbkmoney.fistful.reporter.handler.identity;
 
 import com.rbkmoney.dao.DaoException;
-import com.rbkmoney.fistful.identity.ChallengeChange;
-import com.rbkmoney.fistful.identity.ChallengeChangePayload;
-import com.rbkmoney.fistful.identity.TimestampedChange;
+import com.rbkmoney.fistful.identity.*;
 import com.rbkmoney.fistful.reporter.dao.ChallengeDao;
 import com.rbkmoney.fistful.reporter.dao.IdentityDao;
-import com.rbkmoney.fistful.reporter.domain.enums.ChallengeEventType;
 import com.rbkmoney.fistful.reporter.domain.enums.ChallengeStatus;
-import com.rbkmoney.fistful.reporter.domain.enums.IdentityEventType;
+import com.rbkmoney.fistful.reporter.domain.enums.*;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Challenge;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Identity;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
@@ -75,10 +72,24 @@ public class IdentityChallengeCreatedHandler implements IdentityEventHandler {
     }
 
     private void updateIdentity(MachineEvent event, TimestampedChange change) {
-        Identity identity = identityDao.get(event.getSourceId());
+        Identity oldIdentity = identityDao.get(event.getSourceId());
+        Identity updatedIdentity = update(oldIdentity, change, event);
+        identityDao.save(updatedIdentity).ifPresentOrElse(
+                id -> {
+                    identityDao.updateNotCurrent(oldIdentity.getId());
+                    log.info("Start identity challenge have been updated, eventId={}, identityId={}",
+                            event.getEventId(), event.getSourceId());
+                },
+                () -> log.info("Identity challenge bound duplicated, eventId={}, identityId={}",
+                        event.getEventId(), event.getSourceId())
+        );
+    }
 
-        Long oldId = identity.getId();
-
+    private Identity update(
+            Identity oldIdentity,
+            TimestampedChange change,
+            MachineEvent event) {
+        Identity identity = new Identity(oldIdentity);
         identity.setId(null);
         identity.setWtime(null);
         identity.setEventId(event.getEventId());
@@ -86,15 +97,6 @@ public class IdentityChallengeCreatedHandler implements IdentityEventHandler {
         identity.setIdentityId(event.getSourceId());
         identity.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
         identity.setEventType(IdentityEventType.IDENTITY_CHALLENGE_CREATED);
-
-        identityDao.save(identity).ifPresentOrElse(
-                id -> {
-                    identityDao.updateNotCurrent(oldId);
-                    log.info("Start identity challenge have been updated, eventId={}, identityId={}",
-                            event.getEventId(), event.getSourceId());
-                },
-                () -> log.info("Identity challenge bound duplicated, eventId={}, identityId={}",
-                        event.getEventId(), event.getSourceId())
-        );
+        return identity;
     }
 }

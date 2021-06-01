@@ -29,22 +29,11 @@ public class IdentityLevelChangedHandler implements IdentityEventHandler {
         try {
             log.info("Start identity level changed handling, eventId={}, identityId={}, level={}",
                     event.getEventId(), event.getSourceId(), change.getChange().getLevelChanged());
-            Identity identity = identityDao.get(event.getSourceId());
-
-            Long oldId = identity.getId();
-
-            identity.setId(null);
-            identity.setWtime(null);
-            identity.setEventId(event.getEventId());
-            identity.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-            identity.setIdentityId(event.getSourceId());
-            identity.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
-            identity.setEventType(IdentityEventType.IDENTITY_LEVEL_CHANGED);
-            identity.setIdentityLevelId(change.getChange().getLevelChanged());
-
-            identityDao.save(identity).ifPresentOrElse(
+            Identity oldIdentity = identityDao.get(event.getSourceId());
+            Identity updatedIdentity = update(oldIdentity, change, event);
+            identityDao.save(updatedIdentity).ifPresentOrElse(
                     id -> {
-                        identityDao.updateNotCurrent(oldId);
+                        identityDao.updateNotCurrent(oldIdentity.getId());
                         log.info("Identity level has been changed, eventId={}, identityId={}, level={}",
                                 event.getEventId(), event.getSourceId(), change.getChange().getLevelChanged());
                     },
@@ -54,6 +43,22 @@ public class IdentityLevelChangedHandler implements IdentityEventHandler {
         } catch (DaoException e) {
             throw new StorageException(e);
         }
+    }
+
+    private Identity update(
+            Identity oldIdentity,
+            TimestampedChange change,
+            MachineEvent event) {
+        Identity identity = new Identity(oldIdentity);
+        identity.setId(null);
+        identity.setWtime(null);
+        identity.setEventId(event.getEventId());
+        identity.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        identity.setIdentityId(event.getSourceId());
+        identity.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
+        identity.setEventType(IdentityEventType.IDENTITY_LEVEL_CHANGED);
+        identity.setIdentityLevelId(change.getChange().getLevelChanged());
+        return identity;
     }
 
 }

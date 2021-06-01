@@ -3,9 +3,7 @@ package com.rbkmoney.fistful.reporter.handler.withdrawal;
 import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.reporter.dao.FistfulCashFlowDao;
 import com.rbkmoney.fistful.reporter.dao.WithdrawalDao;
-import com.rbkmoney.fistful.reporter.domain.enums.FistfulCashFlowChangeType;
-import com.rbkmoney.fistful.reporter.domain.enums.WithdrawalEventType;
-import com.rbkmoney.fistful.reporter.domain.enums.WithdrawalTransferStatus;
+import com.rbkmoney.fistful.reporter.domain.enums.*;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.FistfulCashFlow;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Withdrawal;
 import com.rbkmoney.fistful.reporter.exception.StorageException;
@@ -41,28 +39,15 @@ public class WithdrawalTransferStatusChangedHandler implements WithdrawalEventHa
         try {
 
             log.info("Start withdrawal transfer status changed handling, " +
-                    "eventId={}, withdrawalId={}, transferChange={}",
+                            "eventId={}, withdrawalId={}, transferChange={}",
                     event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
-
-            Withdrawal withdrawal = withdrawalDao.get(event.getSourceId());
-
-            Long oldId = withdrawal.getId();
-
-            withdrawal.setId(null);
-            withdrawal.setWtime(null);
-            withdrawal.setEventId(event.getEventId());
-            withdrawal.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-            withdrawal.setWithdrawalId(event.getSourceId());
-            withdrawal.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
-            withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_TRANSFER_STATUS_CHANGED);
-            Status status = change.getChange().getTransfer().getPayload().getStatusChanged().getStatus();
-            withdrawal.setWithdrawalTransferStatus(TBaseUtil.unionFieldToEnum(status, WithdrawalTransferStatus.class));
-
-            withdrawalDao.save(withdrawal).ifPresentOrElse(
+            Withdrawal oldWithdrawal = withdrawalDao.get(event.getSourceId());
+            Withdrawal updatedWithdrawal = update(oldWithdrawal, change, event);
+            withdrawalDao.save(updatedWithdrawal).ifPresentOrElse(
                     id -> {
-                        withdrawalDao.updateNotCurrent(oldId);
+                        withdrawalDao.updateNotCurrent(oldWithdrawal.getId());
                         List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(
-                                withdrawal.getId(),
+                                updatedWithdrawal.getId(),
                                 FistfulCashFlowChangeType.withdrawal);
                         fillCashFlows(
                                 cashFlows,
@@ -81,5 +66,23 @@ public class WithdrawalTransferStatusChangedHandler implements WithdrawalEventHa
         } catch (DaoException e) {
             throw new StorageException(e);
         }
+    }
+
+    private Withdrawal update(
+            Withdrawal oldWithdrawal,
+            TimestampedChange change,
+            MachineEvent event) {
+        Withdrawal withdrawal = new Withdrawal(oldWithdrawal);
+        withdrawal.setId(null);
+        withdrawal.setWtime(null);
+        withdrawal.setEventId(event.getEventId());
+        withdrawal.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        withdrawal.setWithdrawalId(event.getSourceId());
+        withdrawal.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
+        withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_TRANSFER_STATUS_CHANGED);
+        Status status = change.getChange().getTransfer().getPayload().getStatusChanged().getStatus();
+        withdrawal.setWithdrawalTransferStatus(TBaseUtil.unionFieldToEnum(status, WithdrawalTransferStatus.class));
+
+        return withdrawal;
     }
 }

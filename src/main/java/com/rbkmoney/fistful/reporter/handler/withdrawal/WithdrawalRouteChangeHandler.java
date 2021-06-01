@@ -35,22 +35,12 @@ public class WithdrawalRouteChangeHandler implements WithdrawalEventHandler {
         try {
             log.info("Start withdrawal provider id changed handling, eventId={}, withdrawalId={}",
                     event.getEventId(), event.getSourceId());
-            Withdrawal withdrawal = withdrawalDao.get(event.getSourceId());
-
-            Long oldId = withdrawal.getId();
-
-            withdrawal.setId(null);
-            withdrawal.setWtime(null);
-            withdrawal.setEventId(event.getEventId());
-            withdrawal.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-            withdrawal.setWithdrawalId(event.getSourceId());
-            withdrawal.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
-            withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_ROUTE_CHANGED);
-
-            withdrawalDao.save(withdrawal).ifPresentOrElse(
+            Withdrawal oldWithdrawal = withdrawalDao.get(event.getSourceId());
+            Withdrawal updatedWithdrawal = update(oldWithdrawal, change, event);
+            withdrawalDao.save(updatedWithdrawal).ifPresentOrElse(
                     id -> {
-                        withdrawalDao.updateNotCurrent(oldId);
-                        List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(withdrawal.getId(),
+                        withdrawalDao.updateNotCurrent(oldWithdrawal.getId());
+                        List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(updatedWithdrawal.getId(),
                                 FistfulCashFlowChangeType.withdrawal);
                         fillCashFlows(cashFlows, event, WithdrawalEventType.WITHDRAWAL_ROUTE_CHANGED, id, change);
                         fistfulCashFlowDao.save(cashFlows);
@@ -62,5 +52,20 @@ public class WithdrawalRouteChangeHandler implements WithdrawalEventHandler {
         } catch (DaoException e) {
             throw new StorageException(e);
         }
+    }
+
+    private Withdrawal update(
+            Withdrawal oldWithdrawal,
+            TimestampedChange change,
+            MachineEvent event) {
+        Withdrawal withdrawal = new Withdrawal(oldWithdrawal);
+        withdrawal.setId(null);
+        withdrawal.setWtime(null);
+        withdrawal.setEventId(event.getEventId());
+        withdrawal.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        withdrawal.setWithdrawalId(event.getSourceId());
+        withdrawal.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
+        withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_ROUTE_CHANGED);
+        return withdrawal;
     }
 }

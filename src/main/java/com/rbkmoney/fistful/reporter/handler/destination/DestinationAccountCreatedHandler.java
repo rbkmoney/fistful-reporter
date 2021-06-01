@@ -34,31 +34,12 @@ public class DestinationAccountCreatedHandler implements DestinationEventHandler
         try {
             log.info("Start destination account created handling, eventId={}, destinationId={}",
                     event.getEventId(), event.getSourceId());
-            Destination destination = getDestination(event);
-
-            Long oldId = destination.getId();
-
-            destination.setId(null);
-            destination.setWtime(null);
-            destination.setEventId(event.getEventId());
-            destination.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-            destination.setDestinationId(event.getSourceId());
-            destination.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
-            destination.setEventType(DestinationEventType.DESTINATION_ACCOUNT_CREATED);
-
             Account account = change.getChange().getAccount().getCreated();
-            destination.setAccountId(account.getId());
-            destination.setCurrencyCode(account.getCurrency().getSymbolicCode());
-            destination.setAccounterAccountId(account.getAccounterAccountId());
-
-            Identity identity = getIdentity(event, account);
-            destination.setPartyId(identity.getPartyId());
-            destination.setPartyContractId(identity.getPartyContractId());
-            destination.setIdentityId(identity.getIdentityId());
-
-            destinationDao.save(destination).ifPresentOrElse(
+            Destination oldDestination = getDestination(event);
+            Destination updatedDestination = update(oldDestination, change, event, account);
+            destinationDao.save(updatedDestination).ifPresentOrElse(
                     id -> {
-                        destinationDao.updateNotCurrent(oldId);
+                        destinationDao.updateNotCurrent(oldDestination.getId());
                         log.info("Destination account have been created, eventId={}, destinationId={}, identityId={}",
                                 event.getEventId(), event.getSourceId(), account.getIdentity());
                     },
@@ -68,6 +49,31 @@ public class DestinationAccountCreatedHandler implements DestinationEventHandler
         } catch (DaoException e) {
             throw new StorageException(e);
         }
+    }
+
+    private Destination update(
+            Destination oldDestination,
+            TimestampedChange change,
+            MachineEvent event,
+            Account account) {
+        Destination destination = new Destination(oldDestination);
+        destination.setId(null);
+        destination.setWtime(null);
+        destination.setEventId(event.getEventId());
+        destination.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        destination.setDestinationId(event.getSourceId());
+        destination.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
+        destination.setEventType(DestinationEventType.DESTINATION_ACCOUNT_CREATED);
+
+        destination.setAccountId(account.getId());
+        destination.setCurrencyCode(account.getCurrency().getSymbolicCode());
+        destination.setAccounterAccountId(account.getAccounterAccountId());
+
+        Identity identity = getIdentity(event, account);
+        destination.setPartyId(identity.getPartyId());
+        destination.setPartyContractId(identity.getPartyContractId());
+        destination.setIdentityId(identity.getIdentityId());
+        return destination;
     }
 
     private Destination getDestination(MachineEvent event) {

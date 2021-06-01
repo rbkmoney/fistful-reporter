@@ -35,30 +35,11 @@ public class WalletAccountCreatedHandler implements WalletEventHandler {
             Account account = change.getChange().getAccount().getCreated();
             log.info("Start wallet account created handling, eventId={}, walletId={}, identityId={}",
                     event.getEventId(), event.getSourceId(), account.getIdentity());
-
-            Wallet wallet = getWallet(event);
-
-            Long oldId = wallet.getId();
-
-            wallet.setId(null);
-            wallet.setWtime(null);
-            wallet.setEventId(event.getEventId());
-            wallet.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-            wallet.setWalletId(event.getSourceId());
-            wallet.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
-            wallet.setEventType(WalletEventType.WALLET_ACCOUNT_CREATED);
-            wallet.setAccountId(account.getId());
-            wallet.setAccounterAccountId(account.getAccounterAccountId());
-            wallet.setCurrencyCode(account.getCurrency().getSymbolicCode());
-
-            Identity identity = getIdentity(event, account);
-            wallet.setPartyId(identity.getPartyId());
-            wallet.setPartyContractId(identity.getPartyContractId());
-            wallet.setIdentityId(identity.getIdentityId());
-
-            walletDao.save(wallet).ifPresentOrElse(
+            Wallet oldWallet = getWallet(event);
+            Wallet updatedWallet = update(oldWallet, change, event, account);
+            walletDao.save(updatedWallet).ifPresentOrElse(
                     id -> {
-                        walletDao.updateNotCurrent(oldId);
+                        walletDao.updateNotCurrent(oldWallet.getId());
                         log.info("Wallet account have been changed, eventId={}, walletId={}, identityId={}",
                                 event.getEventId(), event.getSourceId(), account.getIdentity());
                     },
@@ -77,6 +58,29 @@ public class WalletAccountCreatedHandler implements WalletEventHandler {
                             event.getSourceId(), account.getIdentity()));
         }
         return identity;
+    }
+
+    private Wallet update(
+            Wallet oldWallet,
+            TimestampedChange change,
+            MachineEvent event,
+            Account account) {
+        Wallet wallet = new Wallet(oldWallet);
+        wallet.setId(null);
+        wallet.setWtime(null);
+        wallet.setEventId(event.getEventId());
+        wallet.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        wallet.setWalletId(event.getSourceId());
+        wallet.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
+        wallet.setEventType(WalletEventType.WALLET_ACCOUNT_CREATED);
+        wallet.setAccountId(account.getId());
+        wallet.setAccounterAccountId(account.getAccounterAccountId());
+        wallet.setCurrencyCode(account.getCurrency().getSymbolicCode());
+        Identity identity = getIdentity(event, account);
+        wallet.setPartyId(identity.getPartyId());
+        wallet.setPartyContractId(identity.getPartyContractId());
+        wallet.setIdentityId(identity.getIdentityId());
+        return wallet;
     }
 
     private Wallet getWallet(MachineEvent event) {

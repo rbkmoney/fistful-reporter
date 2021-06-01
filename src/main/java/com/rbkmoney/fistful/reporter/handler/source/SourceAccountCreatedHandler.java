@@ -35,29 +35,11 @@ public class SourceAccountCreatedHandler implements SourceEventHandler {
             Account account = change.getChange().getAccount().getCreated();
             log.info("Start source account created handling, eventId={}, sourceId={}, identityId={}",
                     event.getEventId(), event.getSourceId(), account.getIdentity());
-            Source source = getSource(event);
-
-            Long oldId = source.getId();
-
-            source.setId(null);
-            source.setWtime(null);
-            source.setEventId(event.getEventId());
-            source.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-            source.setSourceId(event.getSourceId());
-            source.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
-            source.setEventType(SourceEventType.SOURCE_ACCOUNT_CREATED);
-            source.setAccountId(account.getId());
-            source.setAccounterAccountId(account.getAccounterAccountId());
-            source.setCurrencyCode(account.getCurrency().getSymbolicCode());
-
-            Identity identity = getIdentity(event, account);
-            source.setPartyId(identity.getPartyId());
-            source.setPartyContractId(identity.getPartyContractId());
-            source.setIdentityId(identity.getIdentityId());
-
-            sourceDao.save(source).ifPresentOrElse(
+            Source oldSource = getSource(event);
+            Source updatedSource = update(oldSource, change, event, account);
+            sourceDao.save(updatedSource).ifPresentOrElse(
                     id -> {
-                        sourceDao.updateNotCurrent(oldId);
+                        sourceDao.updateNotCurrent(oldSource.getId());
                         log.info("Source account have been changed, eventId={}, sourceId={}, identityId={}",
                                 event.getEventId(), event.getSourceId(), account.getIdentity());
                     },
@@ -66,6 +48,30 @@ public class SourceAccountCreatedHandler implements SourceEventHandler {
         } catch (DaoException e) {
             throw new StorageException(e);
         }
+    }
+
+    private Source update(
+            Source oldSource,
+            TimestampedChange change,
+            MachineEvent event,
+            Account account) {
+        Source source = new Source(oldSource);
+        source.setId(null);
+        source.setWtime(null);
+        source.setEventId(event.getEventId());
+        source.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        source.setSourceId(event.getSourceId());
+        source.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
+        source.setEventType(SourceEventType.SOURCE_ACCOUNT_CREATED);
+        source.setAccountId(account.getId());
+        source.setAccounterAccountId(account.getAccounterAccountId());
+        source.setCurrencyCode(account.getCurrency().getSymbolicCode());
+
+        Identity identity = getIdentity(event, account);
+        source.setPartyId(identity.getPartyId());
+        source.setPartyContractId(identity.getPartyContractId());
+        source.setIdentityId(identity.getIdentityId());
+        return source;
     }
 
     private Source getSource(MachineEvent event) {

@@ -33,23 +33,11 @@ public class DestinationStatusChangedHandler implements DestinationEventHandler 
             Status status = change.getChange().getStatus().getChanged();
             log.info("Start destination status changed handling, eventId={}, destinationId={}, status={}",
                     event.getEventId(), event.getSourceId(), status);
-
-            Destination destination = destinationDao.get(event.getSourceId());
-
-            Long oldId = destination.getId();
-
-            destination.setId(null);
-            destination.setWtime(null);
-            destination.setEventId(event.getEventId());
-            destination.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-            destination.setDestinationId(event.getSourceId());
-            destination.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
-            destination.setEventType(DestinationEventType.DESTINATION_STATUS_CHANGED);
-            destination.setDestinationStatus(TBaseUtil.unionFieldToEnum(status, DestinationStatus.class));
-
-            destinationDao.save(destination).ifPresentOrElse(
+            Destination oldDestination = destinationDao.get(event.getSourceId());
+            Destination updatedDestination = update(oldDestination, change, event, status);
+            destinationDao.save(updatedDestination).ifPresentOrElse(
                     id -> {
-                        destinationDao.updateNotCurrent(oldId);
+                        destinationDao.updateNotCurrent(oldDestination.getId());
                         log.info("Destination status has been changed, eventId={}, destinationId={}, status={}",
                                 event.getEventId(), event.getSourceId(), status);
                     },
@@ -59,5 +47,22 @@ public class DestinationStatusChangedHandler implements DestinationEventHandler 
         } catch (DaoException e) {
             throw new StorageException(e);
         }
+    }
+
+    private Destination update(
+            Destination oldDestination,
+            TimestampedChange change,
+            MachineEvent event,
+            Status status) {
+        Destination destination = new Destination(oldDestination);
+        destination.setId(null);
+        destination.setWtime(null);
+        destination.setEventId(event.getEventId());
+        destination.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        destination.setDestinationId(event.getSourceId());
+        destination.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
+        destination.setEventType(DestinationEventType.DESTINATION_STATUS_CHANGED);
+        destination.setDestinationStatus(TBaseUtil.unionFieldToEnum(status, DestinationStatus.class));
+        return destination;
     }
 }
