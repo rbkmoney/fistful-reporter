@@ -66,7 +66,6 @@ public class SourceAccountCreatedHandler implements SourceEventHandler {
         source.setAccountId(account.getId());
         source.setAccounterAccountId(account.getAccounterAccountId());
         source.setCurrencyCode(account.getCurrency().getSymbolicCode());
-
         Identity identity = getIdentity(event, account);
         source.setPartyId(identity.getPartyId());
         source.setPartyContractId(identity.getPartyContractId());

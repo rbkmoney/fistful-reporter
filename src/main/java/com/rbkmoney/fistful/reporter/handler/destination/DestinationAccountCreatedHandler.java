@@ -64,11 +64,9 @@ public class DestinationAccountCreatedHandler implements DestinationEventHandler
         destination.setDestinationId(event.getSourceId());
         destination.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
         destination.setEventType(DestinationEventType.DESTINATION_ACCOUNT_CREATED);
-
         destination.setAccountId(account.getId());
         destination.setCurrencyCode(account.getCurrency().getSymbolicCode());
         destination.setAccounterAccountId(account.getAccounterAccountId());
-
         Identity identity = getIdentity(event, account);
         destination.setPartyId(identity.getPartyId());
         destination.setPartyContractId(identity.getPartyContractId());

@@ -45,7 +45,7 @@ public class DepositTransferStatusChangedHandler implements DepositEventHandler 
                     id -> {
                         depositDao.updateNotCurrent(oldDeposit.getId());
                         List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(
-                                updatedDeposit.getId(),
+                                id,
                                 FistfulCashFlowChangeType.deposit);
                         fillCashFlows(cashFlows, event, DepositEventType.DEPOSIT_TRANSFER_STATUS_CHANGED, change, id);
                         fistfulCashFlowDao.save(cashFlows);

@@ -35,17 +35,15 @@ public class DepositStatusChangedHandler implements DepositEventHandler {
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
             Status status = change.getChange().getStatusChanged().getStatus();
-
             log.info("Start deposit status changed handling, eventId={}, depositId={}, status={}",
                     event.getEventId(), event.getSourceId(), status);
-
             Deposit oldDeposit = depositDao.get(event.getSourceId());
             Deposit updatedDeposit = update(oldDeposit, change, event, status);
             depositDao.save(updatedDeposit).ifPresentOrElse(
                     id -> {
                         depositDao.updateNotCurrent(oldDeposit.getId());
                         List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(
-                                updatedDeposit.getId(),
+                                id,
                                 FistfulCashFlowChangeType.deposit);
                         fillCashFlows(cashFlows, event, DepositEventType.DEPOSIT_STATUS_CHANGED, change, id);
                         fistfulCashFlowDao.save(cashFlows);

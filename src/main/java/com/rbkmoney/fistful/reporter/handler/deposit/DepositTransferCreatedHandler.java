@@ -93,8 +93,6 @@ public class DepositTransferCreatedHandler implements DepositEventHandler {
         deposit.setEventOccuredAt(TypeUtil.stringToLocalDateTime(change.getOccuredAt()));
         deposit.setEventType(DepositEventType.DEPOSIT_TRANSFER_CREATED);
         deposit.setDepositTransferStatus(DepositTransferStatus.created);
-
-
         deposit.setFee(CashFlowConverter.getFistfulFee(postings));
         deposit.setProviderFee(CashFlowConverter.getFistfulProviderFee(postings));
         return deposit;

@@ -40,7 +40,7 @@ public class WithdrawalRouteChangeHandler implements WithdrawalEventHandler {
             withdrawalDao.save(updatedWithdrawal).ifPresentOrElse(
                     id -> {
                         withdrawalDao.updateNotCurrent(oldWithdrawal.getId());
-                        List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(updatedWithdrawal.getId(),
+                        List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(id,
                                 FistfulCashFlowChangeType.withdrawal);
                         fillCashFlows(cashFlows, event, WithdrawalEventType.WITHDRAWAL_ROUTE_CHANGED, id, change);
                         fistfulCashFlowDao.save(cashFlows);

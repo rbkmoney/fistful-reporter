@@ -47,7 +47,7 @@ public class WithdrawalTransferStatusChangedHandler implements WithdrawalEventHa
                     id -> {
                         withdrawalDao.updateNotCurrent(oldWithdrawal.getId());
                         List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(
-                                updatedWithdrawal.getId(),
+                                id,
                                 FistfulCashFlowChangeType.withdrawal);
                         fillCashFlows(
                                 cashFlows,
@@ -82,7 +82,6 @@ public class WithdrawalTransferStatusChangedHandler implements WithdrawalEventHa
         withdrawal.setEventType(WithdrawalEventType.WITHDRAWAL_TRANSFER_STATUS_CHANGED);
         Status status = change.getChange().getTransfer().getPayload().getStatusChanged().getStatus();
         withdrawal.setWithdrawalTransferStatus(TBaseUtil.unionFieldToEnum(status, WithdrawalTransferStatus.class));
-
         return withdrawal;
     }
 }

@@ -39,7 +39,6 @@ public class WithdrawalTransferCreatedHandler implements WithdrawalEventHandler 
     @Override
     public void handle(TimestampedChange change, MachineEvent event) {
         try {
-
             log.info("Start withdrawal transfer created handling, eventId={}, withdrawalId={}, transferChange={}",
                     event.getEventId(), event.getSourceId(), change.getChange().getTransfer());
             Withdrawal oldWithdrawal = withdrawalDao.get(event.getSourceId());

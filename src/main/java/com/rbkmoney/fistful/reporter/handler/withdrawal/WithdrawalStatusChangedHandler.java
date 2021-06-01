@@ -42,7 +42,7 @@ public class WithdrawalStatusChangedHandler implements WithdrawalEventHandler {
                     id -> {
                         withdrawalDao.updateNotCurrent(oldWithdrawal.getId());
                         List<FistfulCashFlow> cashFlows = fistfulCashFlowDao.getByObjId(
-                                updatedWithdrawal.getId(),
+                                id,
                                 FistfulCashFlowChangeType.withdrawal);
                         fillCashFlows(cashFlows, event, WithdrawalEventType.WITHDRAWAL_STATUS_CHANGED, id, change);
                         fistfulCashFlowDao.save(cashFlows);
