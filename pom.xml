@@ -25,7 +25,7 @@
         <exposed.ports>${server.port} ${management.port}</exposed.ports>
         <dockerfile.base.service.tag>c0612d6052ac049496b72a23a04acb142035f249</dockerfile.base.service.tag>
         <dockerfile.registry>${env.REGISTRY}</dockerfile.registry>
-        <fistful-proto.version>1.124-7821480</fistful-proto.version>
+        <fistful-proto.version>1.128-d331fce</fistful-proto.version>
         <fistful-reporter-proto.version>1.7-8bec5e6</fistful-reporter-proto.version>
         <file-storage-proto.version>1.24-a77c0c4</file-storage-proto.version>
         <machinegun-proto.version>1.18-d814d69</machinegun-proto.version>

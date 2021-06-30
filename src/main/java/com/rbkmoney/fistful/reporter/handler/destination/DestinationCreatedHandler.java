@@ -3,6 +3,7 @@ package com.rbkmoney.fistful.reporter.handler.destination;
 import com.rbkmoney.dao.DaoException;
 import com.rbkmoney.fistful.base.BankCard;
 import com.rbkmoney.fistful.base.CryptoWallet;
+import com.rbkmoney.fistful.base.DigitalWallet;
 import com.rbkmoney.fistful.base.Resource;
 import com.rbkmoney.fistful.destination.TimestampedChange;
 import com.rbkmoney.fistful.reporter.dao.DestinationDao;
@@ -57,6 +58,12 @@ public class DestinationCreatedHandler implements DestinationEventHandler {
                 CryptoWallet cryptoWallet = resource.getCryptoWallet().getCryptoWallet();
                 destination.setCryptoWalletId(cryptoWallet.getId());
                 destination.setCryptoWalletCurrency(cryptoWallet.getData().getSetField().getFieldName());
+            } else if (resource.isSetDigitalWallet()) {
+                DigitalWallet digitalWallet = resource.getDigitalWallet().getDigitalWallet();
+                destination.setDigitalWalletId(digitalWallet.getId());
+                if (digitalWallet.getData() != null) {
+                    destination.setDigitalWalletProvider(digitalWallet.getData().getSetField().getFieldName());
+                }
             }
             destination.setResourceType(TBaseUtil.unionFieldToEnum(resource, DestinationResourceType.class));
 

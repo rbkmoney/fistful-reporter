@@ -17,6 +17,7 @@ public class DestinationSinkEventTestUtils extends AbstractTestUtils {
         List<Change> changes = asList(
                 createCreatedChangeBankCard(),
                 createCreatedChangeCryptoWallet(),
+                createCreatedChangeDigitalWallet(),
                 createStatusChangedChange(),
                 createAccountCreatedChange(identityId)
         );
@@ -60,6 +61,19 @@ public class DestinationSinkEventTestUtils extends AbstractTestUtils {
                 new com.rbkmoney.fistful.destination.Destination(
                         generateString(),
                         Resource.crypto_wallet(new ResourceCryptoWallet(cryptoWallet))
+                )
+        );
+    }
+
+    private static Change createCreatedChangeDigitalWallet() {
+        DigitalWallet digitalWallet = new DigitalWallet();
+        digitalWallet.setId(UUID.randomUUID().toString());
+        digitalWallet.setData(DigitalData.webmoney(new DigitalDataWebmoney()));
+
+        return Change.created(
+                new com.rbkmoney.fistful.destination.Destination(
+                        generateString(),
+                        Resource.digital_wallet(new ResourceDigitalWallet(digitalWallet))
                 )
         );
     }
