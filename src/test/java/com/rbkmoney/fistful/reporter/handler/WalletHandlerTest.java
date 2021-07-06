@@ -6,6 +6,7 @@ import com.rbkmoney.fistful.reporter.dao.mapper.RecordRowMapper;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Identity;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Wallet;
 import com.rbkmoney.fistful.reporter.handler.wallet.WalletAccountCreatedHandler;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -34,6 +35,7 @@ public class WalletHandlerTest extends AbstractHandlerConfig {
         wallet.setCurrent(true);
         walletDao.save(wallet);
         identity.setIdentityId(wallet.getIdentityId());
+        identity.setCurrent(true);
         identityDao.save(identity);
         account.setIdentity(wallet.getIdentityId());
         walletAccountCreatedHandler.handle(
