@@ -6,7 +6,6 @@ import com.rbkmoney.fistful.reporter.dao.mapper.RecordRowMapper;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Identity;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Wallet;
 import com.rbkmoney.fistful.reporter.handler.wallet.WalletAccountCreatedHandler;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
