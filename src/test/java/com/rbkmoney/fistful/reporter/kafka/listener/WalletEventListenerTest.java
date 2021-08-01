@@ -1,35 +1,35 @@
 package com.rbkmoney.fistful.reporter.kafka.listener;
 
 import com.rbkmoney.dao.DaoException;
-import com.rbkmoney.fistful.reporter.FistfulReporterApplication;
+import com.rbkmoney.fistful.reporter.config.KafkaPostgresqlSpringBootITest;
 import com.rbkmoney.fistful.reporter.dao.WalletDao;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Wallet;
 import com.rbkmoney.fistful.wallet.Change;
 import com.rbkmoney.fistful.wallet.TimestampedChange;
 import com.rbkmoney.kafka.common.serialization.ThriftSerializer;
 import com.rbkmoney.machinegun.eventsink.SinkEvent;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.rbkmoney.testcontainers.annotations.kafka.config.KafkaProducer;
+import org.apache.thrift.TBase;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 
+import static com.rbkmoney.fistful.reporter.data.TestData.machineEvent;
+import static com.rbkmoney.fistful.reporter.data.TestData.sinkEvent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-@Slf4j
-@DirtiesContext
-@RunWith(SpringRunner.class)
-@SpringBootTest(
-        classes = FistfulReporterApplication.class,
-        properties = {"kafka.state.cache.size=0"})
-public class WalletEventListenerTest extends AbstractListenerTest {
+@KafkaPostgresqlSpringBootITest
+public class WalletEventListenerTest {
 
-    private static final long MESSAGE_TIMEOUT = 20_000L;
+    @Value("${kafka.topic.wallet.name}")
+    private String topicName;
+
+    @Autowired
+    private KafkaProducer<TBase<?, ?>> testThriftKafkaProducer;
 
     @MockBean
     private WalletDao walletDao;
@@ -54,11 +54,10 @@ public class WalletEventListenerTest extends AbstractListenerTest {
                 .thenReturn(new Wallet());
 
         // When
-        produce(sinkEvent, "wallet");
-        Thread.sleep(MESSAGE_TIMEOUT);
+        testThriftKafkaProducer.send(topicName, sinkEvent);
 
         // Then
-        verify(walletDao, times(1))
+        verify(walletDao, timeout(5000).times(1))
                 .save(captor.capture());
         assertThat(captor.getValue().getWalletName())
                 .isEqualTo("wallet");

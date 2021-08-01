@@ -1,28 +1,37 @@
 package com.rbkmoney.fistful.reporter.handler;
 
 import com.rbkmoney.fistful.account.Account;
-import com.rbkmoney.fistful.reporter.config.AbstractHandlerConfig;
+import com.rbkmoney.fistful.reporter.config.PostgresqlSpringBootITest;
+import com.rbkmoney.fistful.reporter.dao.IdentityDao;
+import com.rbkmoney.fistful.reporter.dao.WalletDao;
 import com.rbkmoney.fistful.reporter.dao.mapper.RecordRowMapper;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Identity;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Wallet;
 import com.rbkmoney.fistful.reporter.handler.wallet.WalletAccountCreatedHandler;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import static com.rbkmoney.fistful.reporter.domain.tables.Wallet.WALLET;
-import static com.rbkmoney.fistful.reporter.utils.handler.WalletHandlerTestUtils.createAccountCreated;
-import static com.rbkmoney.fistful.reporter.utils.handler.WalletHandlerTestUtils.createMachineEvent;
-import static io.github.benas.randombeans.api.EnhancedRandom.random;
-import static org.junit.Assert.assertEquals;
+import static com.rbkmoney.fistful.reporter.util.handler.WalletHandlerTestUtil.createAccountCreated;
+import static com.rbkmoney.fistful.reporter.util.handler.WalletHandlerTestUtil.createMachineEvent;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.random;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class WalletHandlerTest extends AbstractHandlerConfig {
+@PostgresqlSpringBootITest
+public class WalletHandlerTest {
 
     @Autowired
     private WalletAccountCreatedHandler walletAccountCreatedHandler;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private WalletDao walletDao;
+
+    @Autowired
+    private IdentityDao identityDao;
 
     Wallet wallet = random(Wallet.class);
     Identity identity = random(Identity.class);
@@ -46,11 +55,5 @@ public class WalletHandlerTest extends AbstractHandlerConfig {
                 jdbcTemplate.queryForObject(sqlStatement,
                         new RecordRowMapper<>(WALLET, Wallet.class)).getCurrent()
         );
-    }
-
-
-    @Override
-    protected int getExpectedSize() {
-        return 0;
     }
 }

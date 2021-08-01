@@ -1,4 +1,4 @@
-package com.rbkmoney.fistful.reporter.utils.handler;
+package com.rbkmoney.fistful.reporter.util.handler;
 
 import com.rbkmoney.fistful.identity.*;
 import com.rbkmoney.kafka.common.serialization.ThriftSerializer;
@@ -7,7 +7,7 @@ import com.rbkmoney.machinegun.msgpack.Value;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 
-public class IdentityHandlerTestUtils {
+public class IdentityHandlerTestUtil {
 
     public static MachineEvent createMachineEvent(String id) {
         return new MachineEvent()
@@ -38,6 +38,4 @@ public class IdentityHandlerTestUtils {
                         ChallengeChangePayload.created(random(Challenge.class, "proofs", "status"))
                 )));
     }
-
-
 }

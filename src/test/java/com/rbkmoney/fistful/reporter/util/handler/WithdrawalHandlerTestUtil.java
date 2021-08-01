@@ -1,16 +1,19 @@
-package com.rbkmoney.fistful.reporter.utils.handler;
+package com.rbkmoney.fistful.reporter.util.handler;
 
-import com.rbkmoney.fistful.withdrawal.*;
+import com.rbkmoney.fistful.withdrawal.Change;
+import com.rbkmoney.fistful.withdrawal.StatusChange;
+import com.rbkmoney.fistful.withdrawal.TimestampedChange;
+import com.rbkmoney.fistful.withdrawal.TransferChange;
 import com.rbkmoney.fistful.withdrawal.status.Status;
 import com.rbkmoney.fistful.withdrawal.status.Succeeded;
 import com.rbkmoney.kafka.common.serialization.ThriftSerializer;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.machinegun.msgpack.Value;
 
-import static com.rbkmoney.fistful.reporter.utils.TransferTestUtil.getCashFlowPayload;
-import static com.rbkmoney.fistful.reporter.utils.TransferTestUtil.getCommitedPayload;
+import static com.rbkmoney.fistful.reporter.util.TransferTestUtil.getCashFlowPayload;
+import static com.rbkmoney.fistful.reporter.util.TransferTestUtil.getCommitedPayload;
 
-public class WithdrawalHandlerTestUtils {
+public class WithdrawalHandlerTestUtil {
 
     public static MachineEvent createMachineEvent(String id) {
         return new MachineEvent()
@@ -40,6 +43,4 @@ public class WithdrawalHandlerTestUtils {
                 .setOccuredAt("2021-05-31T06:12:27Z")
                 .setChange(Change.transfer(new TransferChange(getCashFlowPayload())));
     }
-
-
 }

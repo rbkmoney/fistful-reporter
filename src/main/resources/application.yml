@@ -47,9 +47,6 @@ spring:
     ansi:
       enabled: always
 
-eventstock:
-  pollingEnable: true
-
 partymanagement:
   url: http://hellgate:8022/v1/processing/partymgmt
   timeout: 5000
@@ -108,3 +105,9 @@ kafka:
       name: source
       listener:
         enabled: false
+
+testcontainers:
+  postgresql:
+    tag: '11.4'
+  kafka:
+    tag: '6.2.0'

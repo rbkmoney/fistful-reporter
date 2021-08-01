@@ -1,22 +1,23 @@
 package com.rbkmoney.fistful.reporter.handler;
 
-import com.rbkmoney.fistful.reporter.config.AbstractHandlerConfig;
+import com.rbkmoney.fistful.reporter.config.PostgresqlSpringBootITest;
 import com.rbkmoney.fistful.reporter.dao.DestinationDao;
 import com.rbkmoney.fistful.reporter.dao.mapper.RecordRowMapper;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Destination;
 import com.rbkmoney.fistful.reporter.handler.destination.DestinationStatusChangedHandler;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import static com.rbkmoney.fistful.reporter.domain.tables.Destination.DESTINATION;
-import static com.rbkmoney.fistful.reporter.utils.handler.DestinationHandlerTestUtils.createMachineEvent;
-import static com.rbkmoney.fistful.reporter.utils.handler.DestinationHandlerTestUtils.createStatusChanged;
-import static io.github.benas.randombeans.api.EnhancedRandom.random;
-import static org.junit.Assert.assertEquals;
+import static com.rbkmoney.fistful.reporter.util.handler.DestinationHandlerTestUtil.createMachineEvent;
+import static com.rbkmoney.fistful.reporter.util.handler.DestinationHandlerTestUtil.createStatusChanged;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.random;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DestinationHandlerTest extends AbstractHandlerConfig {
+@PostgresqlSpringBootITest
+public class DestinationHandlerTest {
 
     @Autowired
     private DestinationStatusChangedHandler destinationStatusChangedHandler;
@@ -30,7 +31,7 @@ public class DestinationHandlerTest extends AbstractHandlerConfig {
     Destination destination = random(Destination.class);
     String sqlStatement = "select * from fr.destination where id='" + destination.getId() + "';";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         destination.setCurrent(true);
         destinationDao.save(destination);
@@ -47,10 +48,5 @@ public class DestinationHandlerTest extends AbstractHandlerConfig {
                 jdbcTemplate.queryForObject(sqlStatement,
                         new RecordRowMapper<>(DESTINATION, Destination.class)).getCurrent()
         );
-    }
-
-    @Override
-    protected int getExpectedSize() {
-        return 0;
     }
 }

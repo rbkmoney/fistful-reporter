@@ -1,20 +1,24 @@
 package com.rbkmoney.fistful.reporter.handler;
 
-import com.rbkmoney.fistful.reporter.config.AbstractHandlerConfig;
+import com.rbkmoney.fistful.reporter.config.PostgresqlSpringBootITest;
+import com.rbkmoney.fistful.reporter.dao.IdentityDao;
 import com.rbkmoney.fistful.reporter.dao.mapper.RecordRowMapper;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Identity;
-import com.rbkmoney.fistful.reporter.handler.identity.*;
-import org.junit.Before;
-import org.junit.Test;
+import com.rbkmoney.fistful.reporter.handler.identity.IdentityChallengeCreatedHandler;
+import com.rbkmoney.fistful.reporter.handler.identity.IdentityEffectiveChallengeChangedHandler;
+import com.rbkmoney.fistful.reporter.handler.identity.IdentityLevelChangedHandler;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import static com.rbkmoney.fistful.reporter.domain.tables.Identity.IDENTITY;
-import static com.rbkmoney.fistful.reporter.utils.handler.IdentityHandlerTestUtils.*;
-import static io.github.benas.randombeans.api.EnhancedRandom.random;
-import static org.junit.Assert.assertEquals;
+import static com.rbkmoney.fistful.reporter.util.handler.IdentityHandlerTestUtil.*;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.random;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class IdentityHandlerTest extends AbstractHandlerConfig {
+@PostgresqlSpringBootITest
+public class IdentityHandlerTest {
 
     @Autowired
     private IdentityLevelChangedHandler identityLevelChangedHandler;
@@ -25,6 +29,8 @@ public class IdentityHandlerTest extends AbstractHandlerConfig {
     @Autowired
     private IdentityChallengeCreatedHandler identityChallengeCreatedHandler;
 
+    @Autowired
+    private IdentityDao identityDao;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -32,7 +38,7 @@ public class IdentityHandlerTest extends AbstractHandlerConfig {
     Identity identity = random(Identity.class);
     String sqlStatement = "select * from fr.identity where id='" + identity.getId() + "';";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         identity.setCurrent(true);
         identityDao.save(identity);
@@ -72,12 +78,5 @@ public class IdentityHandlerTest extends AbstractHandlerConfig {
                 jdbcTemplate.queryForObject(sqlStatement,
                         new RecordRowMapper<>(IDENTITY, Identity.class)).getCurrent()
         );
-    }
-
-
-
-    @Override
-    protected int getExpectedSize() {
-        return 0;
     }
 }

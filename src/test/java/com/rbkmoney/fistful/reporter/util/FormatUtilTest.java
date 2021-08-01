@@ -1,7 +1,6 @@
-package com.rbkmoney.fistful.reporter.utils;
+package com.rbkmoney.fistful.reporter.util;
 
-import com.rbkmoney.fistful.reporter.util.FormatUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
 

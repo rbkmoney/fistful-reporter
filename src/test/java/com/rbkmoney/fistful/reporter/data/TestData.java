@@ -1,82 +1,33 @@
-package com.rbkmoney.fistful.reporter.utils;
+package com.rbkmoney.fistful.reporter.data;
 
-import com.rbkmoney.easyway.AbstractTestUtils;
-import com.rbkmoney.fistful.reporter.dao.IdentityDao;
-import com.rbkmoney.fistful.reporter.dao.WalletDao;
-import com.rbkmoney.fistful.reporter.dao.WithdrawalDao;
 import com.rbkmoney.fistful.reporter.domain.enums.WithdrawalEventType;
 import com.rbkmoney.fistful.reporter.domain.enums.WithdrawalStatus;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Identity;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Report;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Wallet;
 import com.rbkmoney.fistful.reporter.domain.tables.pojos.Withdrawal;
-import com.rbkmoney.geck.serializer.kit.mock.MockMode;
-import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.rbkmoney.kafka.common.serialization.ThriftSerializer;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
+import com.rbkmoney.machinegun.eventsink.SinkEvent;
+import com.rbkmoney.machinegun.msgpack.Value;
+import org.apache.thrift.TBase;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.github.benas.randombeans.api.EnhancedRandom.random;
-import static io.github.benas.randombeans.api.EnhancedRandom.randomListOf;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.random;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.randomListOf;
+import static com.rbkmoney.testcontainers.annotations.util.ValuesGenerator.*;
 
-public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
+public class TestData {
 
-    public static MockTBaseProcessor mockTBaseProcessor = new MockTBaseProcessor(MockMode.ALL, 10, 1);
+    public static final String identityId = generateString();
+    public static final String partyId = generateString();
+    public static final String contractId = generateString();
+    public static final String walletId = generateString();
 
-    protected String identityId = generateString();
-    protected String partyId = generateString();
-    protected String contractId = generateString();
-    protected String walletId = generateString();
-    protected Report report = createReport();
-
-    @Autowired
-    protected IdentityDao identityDao;
-
-    @Autowired
-    protected WalletDao walletDao;
-
-    @Autowired
-    protected WithdrawalDao withdrawalDao;
-
-    protected abstract int getExpectedSize();
-
-    protected void saveWithdrawalsDependencies() {
-        for (Identity identity : createIdentities(identityId, partyId, contractId)) {
-            identityDao.save(identity);
-        }
-        for (Wallet wallet : createWallets(identityId, partyId, contractId, walletId)) {
-            walletDao.save(wallet);
-        }
-        for (Withdrawal withdrawal : createWithdrawals(
-                identityId,
-                partyId,
-                contractId,
-                walletId,
-                getInFromToPeriodTime())) {
-            withdrawalDao.save(withdrawal);
-        }
-    }
-
-    protected Report createReport() {
-        return createReport(partyId, contractId, getToTime(), getFromTime());
-    }
-
-    private com.rbkmoney.fistful.reporter.domain.tables.pojos.Report createReport(
-            String partyId,
-            String contractId,
-            LocalDateTime toTime,
-            LocalDateTime fromTime) {
-        Report report = new Report();
-        report.setPartyId(partyId);
-        report.setContractId(contractId);
-        report.setToTime(toTime);
-        report.setFromTime(fromTime);
-        return report;
-    }
-
-    private List<Identity> createIdentities(String identityId, String partyId, String contractId) {
+    public static List<Identity> createIdentities(String identityId, String partyId, String contractId) {
         List<Identity> identities = new ArrayList<>();
         for (Identity identity : randomListOf(2, Identity.class)) {
             identity.setPartyId(partyId);
@@ -92,7 +43,7 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
         return identities;
     }
 
-    private List<Wallet> createWallets(String identityId, String partyId, String contractId, String walletId) {
+    public static List<Wallet> createWallets(String identityId, String partyId, String contractId, String walletId) {
         List<Wallet> wallets = new ArrayList<>();
         for (Wallet wallet : randomListOf(2, Wallet.class)) {
             wallet.setWalletId(walletId);
@@ -105,14 +56,15 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
         return wallets;
     }
 
-    private List<Withdrawal> createWithdrawals(
+    public static List<Withdrawal> createWithdrawals(
             String identityId,
             String partyId,
             String contractId,
             String walletId,
-            LocalDateTime eventCreatedAtTime) {
+            LocalDateTime eventCreatedAtTime,
+            int expectedSize) {
         List<Withdrawal> withdrawals = new ArrayList<>();
-        for (Withdrawal withdrawal : randomListOf(getExpectedSize(), Withdrawal.class)) {
+        for (Withdrawal withdrawal : randomListOf(expectedSize, Withdrawal.class)) {
             fillAsReportWithdrawal(identityId, partyId, contractId, walletId, eventCreatedAtTime, withdrawal);
             withdrawals.add(withdrawal);
         }
@@ -162,7 +114,28 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
         return withdrawals;
     }
 
-    private void fillAsReportWithdrawal(
+    public static Report createReport() {
+        return createReport(partyId, contractId, getToTime(), getFromTime());
+    }
+
+    public static SinkEvent sinkEvent(MachineEvent machineEvent) {
+        SinkEvent sinkEvent = new SinkEvent();
+        sinkEvent.setEvent(machineEvent);
+        return sinkEvent;
+    }
+
+    public static <T extends TBase> MachineEvent machineEvent(
+            ThriftSerializer<T> depositChangeSerializer,
+            T change) {
+        return new MachineEvent()
+                .setEventId(1L)
+                .setSourceId("source_id")
+                .setSourceNs("source_ns")
+                .setCreatedAt("2016-03-22T06:12:27Z")
+                .setData(Value.bin(depositChangeSerializer.serialize("", change)));
+    }
+
+    private static void fillAsReportWithdrawal(
             String identityId,
             String partyId,
             String contractId,
@@ -179,5 +152,18 @@ public abstract class AbstractWithdrawalTestUtils extends AbstractTestUtils {
         withdrawal.setIdentityId(identityId);
         withdrawal.setCurrencyCode("RUB");
         withdrawal.setCurrent(true);
+    }
+
+    private static com.rbkmoney.fistful.reporter.domain.tables.pojos.Report createReport(
+            String partyId,
+            String contractId,
+            LocalDateTime toTime,
+            LocalDateTime fromTime) {
+        Report report = new Report();
+        report.setPartyId(partyId);
+        report.setContractId(contractId);
+        report.setToTime(toTime);
+        report.setFromTime(fromTime);
+        return report;
     }
 }

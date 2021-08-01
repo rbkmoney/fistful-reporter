@@ -1,25 +1,12 @@
-package com.rbkmoney.fistful.reporter.utils.handler;
+package com.rbkmoney.fistful.reporter.util.handler;
 
-import com.rbkmoney.fistful.base.CryptoCurrency;
-import com.rbkmoney.fistful.base.CryptoData;
-import com.rbkmoney.fistful.base.CryptoDataBitcoin;
-import com.rbkmoney.fistful.base.DigitalData;
-import com.rbkmoney.fistful.base.DigitalDataWebmoney;
-import com.rbkmoney.fistful.base.Resource;
-import com.rbkmoney.fistful.base.ResourceBankCard;
-import com.rbkmoney.fistful.base.ResourceCryptoWallet;
-import com.rbkmoney.fistful.base.ResourceDigitalWallet;
-import com.rbkmoney.fistful.destination.Authorized;
-import com.rbkmoney.fistful.destination.Change;
-import com.rbkmoney.fistful.destination.Destination;
-import com.rbkmoney.fistful.destination.Status;
-import com.rbkmoney.fistful.destination.StatusChange;
-import com.rbkmoney.fistful.destination.TimestampedChange;
+import com.rbkmoney.fistful.base.*;
+import com.rbkmoney.fistful.destination.*;
 import com.rbkmoney.kafka.common.serialization.ThriftSerializer;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.machinegun.msgpack.Value;
 
-public class DestinationHandlerTestUtils {
+public class DestinationHandlerTestUtil {
 
     public static final String DESTINATION_NAME = "name";
 
@@ -85,19 +72,19 @@ public class DestinationHandlerTestUtils {
 
     public static ResourceDigitalWallet createResourceDigitalWallet() {
         ResourceDigitalWallet resourceDigitalWallet = new ResourceDigitalWallet();
-        resourceDigitalWallet.setDigitalWallet(DestinationHandlerTestUtils.createFistfulDigitalWallet());
+        resourceDigitalWallet.setDigitalWallet(DestinationHandlerTestUtil.createFistfulDigitalWallet());
         return resourceDigitalWallet;
     }
 
     public static ResourceCryptoWallet createResourceCryptoWallet() {
         ResourceCryptoWallet resourceCryptoWallet = new ResourceCryptoWallet();
-        resourceCryptoWallet.setCryptoWallet(DestinationHandlerTestUtils.createFistfulCryptoWallet());
+        resourceCryptoWallet.setCryptoWallet(DestinationHandlerTestUtil.createFistfulCryptoWallet());
         return resourceCryptoWallet;
     }
 
     public static ResourceBankCard createResourceBankCard() {
         ResourceBankCard resourceBankCard = new ResourceBankCard();
-        resourceBankCard.setBankCard(DestinationHandlerTestUtils.createFistfulBankCard());
+        resourceBankCard.setBankCard(DestinationHandlerTestUtil.createFistfulBankCard());
         return resourceBankCard;
     }
 
@@ -108,5 +95,4 @@ public class DestinationHandlerTestUtils {
         fistfulDestination.setName(DESTINATION_NAME);
         return fistfulDestination;
     }
-
 }
