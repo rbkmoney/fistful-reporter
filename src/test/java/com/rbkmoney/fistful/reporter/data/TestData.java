@@ -118,6 +118,19 @@ public class TestData {
         return createReport(partyId, contractId, getToTime(), getFromTime());
     }
 
+    private static com.rbkmoney.fistful.reporter.domain.tables.pojos.Report createReport(
+            String partyId,
+            String contractId,
+            LocalDateTime toTime,
+            LocalDateTime fromTime) {
+        Report report = new Report();
+        report.setPartyId(partyId);
+        report.setContractId(contractId);
+        report.setToTime(toTime);
+        report.setFromTime(fromTime);
+        return report;
+    }
+
     public static SinkEvent sinkEvent(MachineEvent machineEvent) {
         SinkEvent sinkEvent = new SinkEvent();
         sinkEvent.setEvent(machineEvent);
@@ -152,18 +165,5 @@ public class TestData {
         withdrawal.setIdentityId(identityId);
         withdrawal.setCurrencyCode("RUB");
         withdrawal.setCurrent(true);
-    }
-
-    private static com.rbkmoney.fistful.reporter.domain.tables.pojos.Report createReport(
-            String partyId,
-            String contractId,
-            LocalDateTime toTime,
-            LocalDateTime fromTime) {
-        Report report = new Report();
-        report.setPartyId(partyId);
-        report.setContractId(contractId);
-        report.setToTime(toTime);
-        report.setFromTime(fromTime);
-        return report;
     }
 }
